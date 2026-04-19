@@ -1285,7 +1285,51 @@ export default function CustomerApp({
                       und bereite den nächsten Termin sauber vor.
                     </p>
                   </div>
+{/* MEIN SALON FIX */}
+<div className="cu-card cu-card-padding" style={{ marginTop: "16px" }}>
+  <span className="cu-mini-badge">Dein Salon</span>
 
+  <div style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "14px",
+    marginTop: "14px"
+  }}>
+    
+    <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+      
+      <div style={{
+        width: "52px",
+        height: "52px",
+        borderRadius: "14px",
+        background: "linear-gradient(135deg, #d4af37, #e8cb73)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontWeight: "800",
+        color: "#111"
+      }}>
+        HP
+      </div>
+
+      <div>
+        <h3 style={{ margin: 0 }}>Hair Pass Studio</h3>
+        <p style={{ margin: "4px 0", fontSize: "13px", opacity: 0.7 }}>
+          Luxury Hair & Color
+        </p>
+
+        <div style={{ color: "#9ff0b8", fontSize: "12px" }}>
+          ● Live verbunden
+        </div>
+      </div>
+    </div>
+
+    <button className="cu-secondary-btn">
+      Öffnen
+    </button>
+  </div>
+</div>
                   <button
                     className="cu-primary-btn"
                     onClick={() => {

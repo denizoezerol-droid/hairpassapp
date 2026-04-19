@@ -133,6 +133,63 @@ export default function SalonApp({
   const [salonNote, setSalonNote] = useState("");
   const [noteSaved, setNoteSaved] = useState(false);
   const [popup, setPopup] = useState({ visible: false, message: "" });
+  const previousRequestIdsRef = useRef([]);
+const audioUnlockedRef = useRef(false);
+
+const unlockAudio = () => {
+  audioUnlockedRef.current = true;
+};
+
+const playTone = (type = "default") => {
+  try {
+    if (!audioUnlockedRef.current) return;
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return;
+
+    const ctx = new AudioContextClass();
+
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    if (type === "confirmed") {
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(760, ctx.currentTime);
+      oscillator.frequency.linearRampToValueAtTime(920, ctx.currentTime + 0.12);
+      gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.35);
+    } else {
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(640, ctx.currentTime);
+      gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.22);
+    }
+  } catch (error) {
+    console.error("Ton konnte nicht abgespielt werden:", error);
+  }
+};
+
+const showPopupMessage = (message, tone = null) => {
+  setPopup({ visible: true, message });
+
+  if (tone) {
+    playTone(tone);
+  }
+
+  window.clearTimeout(showPopupMessage.timeoutId);
+  showPopupMessage.timeoutId = window.setTimeout(() => {
+    setPopup({ visible: false, message: "" });
+  }, 2400);
+};
 
   useEffect(() => {
     const existing = document.getElementById("hairpass-salon-premium-v2");

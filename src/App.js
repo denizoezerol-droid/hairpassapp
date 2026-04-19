@@ -249,11 +249,12 @@ export default function App() {
   if (step === "customer-dashboard") {
     return (
       <CustomerApp
-        onLogout={handleLogout}
-        currentUser={loggedInUser}
-        sharedRequests={customerRequests}
-        onCreateRequest={handleCreateRequest}
-      />
+  onLogout={handleLogout}
+  currentUser={loggedInUser}
+  sharedRequests={customerRequests}
+  confirmedRequests={confirmedRequests}
+  onCreateRequest={handleCreateRequest}
+/>
     );
   }
 

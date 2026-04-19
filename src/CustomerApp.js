@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const MAIN_SERVICES = [
   { id: "cut", name: "Haarschnitt", description: "Waschen, Schneiden, Styling", icon: "✂️" },

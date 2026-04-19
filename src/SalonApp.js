@@ -186,11 +186,11 @@ export default function SalonApp({
   const audioUnlockedRef = useRef(false);
 
   useEffect(() => {
-    const existing = document.getElementById("hairpass-salon-block-a-styles");
+    const existing = document.getElementById("hairpass-salon-dynamic-final");
     if (existing) return;
 
     const style = document.createElement("style");
-    style.id = "hairpass-salon-block-a-styles";
+    style.id = "hairpass-salon-dynamic-final";
     style.innerHTML = `
       * { box-sizing: border-box; }
       html, body, #root {
@@ -358,7 +358,7 @@ export default function SalonApp({
         font-size: 14px;
       }
 
-      .sa-stat-card {
+            .sa-stat-card {
         text-align: left;
         padding: 16px;
         border-radius: 20px;
@@ -674,10 +674,7 @@ export default function SalonApp({
 
       return {
         ...request,
-        customerName:
-          request.customerName ||
-          matchingCustomer?.fullName ||
-          "Unbekannter Kunde",
+        customerName: request.customerName || matchingCustomer?.fullName || "Unbekannter Kunde",
       };
     });
   }, [sharedRequests, customers]);
@@ -696,9 +693,7 @@ export default function SalonApp({
   const monthlyRevenue = confirmedRequests.length * 320;
   const averageRating =
     reviews.length > 0
-      ? (
-          reviews.reduce((sum, item) => sum + item.rating, 0) / reviews.length
-        ).toFixed(1)
+      ? (reviews.reduce((sum, item) => sum + item.rating, 0) / reviews.length).toFixed(1)
       : "0.0";
 
   const topCustomers = [...customers]
@@ -866,7 +861,9 @@ export default function SalonApp({
               <div className="sa-grid-2">
                 <div className="sa-card sa-card-padding">
                   <span className="sa-mini-badge">Öffnungszeiten</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Hair Pass Studio</h3>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>
+                    {currentUser?.salonName || "Hair Pass Studio"}
+                  </h3>
                   <div className="sa-hours-list">
                     {OPENING_HOURS.map((item) => (
                       <div key={item.day} className="sa-hours-row">
@@ -938,9 +935,7 @@ export default function SalonApp({
 
                       <div className="sa-summary-block">
                         <span className="sa-summary-label">Wunschfriseur</span>
-                        <p className="sa-summary-text">
-                          {customerRequests[0].preferredStylist || "Egal"}
-                        </p>
+                        <p className="sa-summary-text">{customerRequests[0].preferredStylist || "Egal"}</p>
                       </div>
 
                       <div className="sa-summary-block">

@@ -920,7 +920,13 @@ const showPopupMessage = (message, tone = null) => {
               </p>
             </div>
 
-            <button className="cu-logout-btn" onClick={onLogout}>
+            <button
+  className="cu-logout-btn"
+  onClick={() => {
+    unlockAudio();
+    onLogout();
+  }}
+>
               Logout
             </button>
           </div>

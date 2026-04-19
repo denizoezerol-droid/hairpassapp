@@ -252,7 +252,7 @@ export default function App() {
   onLogout={handleLogout}
   currentUser={loggedInUser}
   sharedRequests={customerRequests}
-  confirmedRequests={confirmedRequests}
+  confirmedRequests={[]}
   onCreateRequest={handleCreateRequest}
 />
     );

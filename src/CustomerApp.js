@@ -25,6 +25,15 @@ const STYLIST_OPTIONS = [
   "Color Specialist",
 ];
 
+const SALON_PROFILE = {
+  name: "Hair Pass Studio",
+  subtitle: "Luxury Hair & Color",
+  logoText: "HP",
+  status: "Live verbunden",
+  openingShort: "Mo–Fr 09:00–18:00",
+  address: "Premium Salon Partner",
+};
+
 const OPENING_HOURS = [
   { day: "Montag", value: "09:00 – 18:00" },
   { day: "Dienstag", value: "09:00 – 18:00" },
@@ -34,15 +43,6 @@ const OPENING_HOURS = [
   { day: "Samstag", value: "09:00 – 14:00" },
   { day: "Sonntag", value: "Geschlossen" },
 ];
-
-const SALON_PROFILE = {
-  name: "Hair Pass Studio",
-  subtitle: "Luxury Hair & Color",
-  logoText: "HP",
-  status: "Live",
-  openingShort: "Mo–Fr 09:00–18:00",
-  address: "Premium Salon Partner",
-};
 
 const INITIAL_HISTORY = [
   {
@@ -338,11 +338,11 @@ export default function CustomerApp({
   }, [currentUser]);
 
   useEffect(() => {
-    const existing = document.getElementById("hairpass-customer-block-a-styles");
+    const existing = document.getElementById("hairpass-customer-dynamic-final");
     if (existing) return;
 
     const style = document.createElement("style");
-    style.id = "hairpass-customer-block-a-styles";
+    style.id = "hairpass-customer-dynamic-final";
     style.innerHTML = `
       * { box-sizing: border-box; }
       html, body, #root {
@@ -624,8 +624,7 @@ export default function CustomerApp({
         border-color: rgba(212,175,55,0.35);
         color: #efcf72;
       }
-
-      .cu-summary-block + .cu-summary-block { margin-top: 14px; }
+            .cu-summary-block + .cu-summary-block { margin-top: 14px; }
       .cu-summary-label {
         display: block;
         margin-bottom: 7px;
@@ -939,7 +938,7 @@ export default function CustomerApp({
     }
 
     previousConfirmedIdsRef.current = confirmedIds;
-  }, [confirmedRequests]); // eslint-disable-line
+  }, [confirmedRequests]);
 
   const selectedMainService = useMemo(
     () =>
@@ -1008,23 +1007,22 @@ export default function CustomerApp({
   };
 
   const addDemoInspiration = () => {
-  const demoImages = [
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80",
-    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1200&q=80",
-  ];
+    const demoImages = [
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1200&q=80",
+    ];
 
-  const next = {
-    id: `inspo-${Date.now()}`,
-    title: `Neue Luxus-Inspiration ${inspirations.length + 1}`,
-    subtitle: "Neue Richtung für deinen nächsten Termin",
-    category: "Luxury Look",
-    image: demoImages[inspirations.length % demoImages.length],
+    const next = {
+      id: `inspo-${Date.now()}`,
+      title: `Neue Luxus-Inspiration ${inspirations.length + 1}`,
+      subtitle: "Neue Richtung für deinen nächsten Termin",
+      category: "Luxury Look",
+      image: demoImages[inspirations.length % demoImages.length],
+    };
+
+    setInspirations((prev) => [next, ...prev]);
   };
-
-  setInspirations((prev) => [next, ...prev]);
-};
-
   const handleSaveProfile = () => {
     unlockAudio();
     setProfileSaved(true);
@@ -1143,193 +1141,107 @@ export default function CustomerApp({
 
           {activeTab === "dashboard" && (
             <section className="cu-grid">
-
-            <div className="cu-card cu-card-padding">
-  <span className="cu-mini-badge">Mein Salon</span>
-
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      gap: 14,
-      marginTop: 14,
-      flexWrap: "wrap",
-    }}
-  >
-    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-      <div
-        style={{
-          width: 58,
-          height: 58,
-          borderRadius: 16,
-          background: "linear-gradient(135deg, #d4af37, #e8cb73)",
-          color: "#121212",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 800,
-          fontSize: 18,
-          boxShadow: "0 10px 20px rgba(212,175,55,0.18)",
-        }}
-      >
-        {SALON_PROFILE.logoText}
-      </div>
-
-      <div>
-        <h3 style={{ margin: 0, fontSize: 18 }}>{SALON_PROFILE.name}</h3>
-        <p
-          style={{
-            margin: "4px 0",
-            color: "rgba(255,255,255,0.72)",
-            fontSize: 14,
-          }}
-        >
-          {SALON_PROFILE.subtitle}
-        </p>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            fontSize: 13,
-            color: "#9ff0b8",
-            fontWeight: 700,
-          }}
-        >
-          <span>●</span>
-          <span>{SALON_PROFILE.status}</span>
-        </div>
-
-        <p
-          style={{
-            margin: "6px 0 0 0",
-            color: "rgba(255,255,255,0.66)",
-            fontSize: 13,
-          }}
-        >
-          {SALON_PROFILE.openingShort}
-        </p>
-      </div>
-    </div>
-
-    <button className="cu-secondary-btn">
-      Salon ansehen
-    </button>
-  </div>
-</div>
-            <div className="cu-card cu-card-padding" style={{ marginBottom: "14px" }}>
-  <span className="cu-mini-badge">Mein Salon</span>
-
-  <div style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    marginTop: "12px"
-  }}>
-    {/* LOGO */}
-    <div style={{
-      width: "54px",
-      height: "54px",
-      borderRadius: "14px",
-      background: "linear-gradient(135deg, #d4af37, #e8cb73)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontWeight: "800",
-      color: "#111"
-    }}>
-      HP
-    </div>
-
-    {/* INFOS */}
-    <div style={{ flex: 1 }}>
-      <h3 style={{ margin: 0, fontSize: "16px" }}>
-        Hair Pass Studio
-      </h3>
-
-      <p style={{
-        margin: "4px 0",
-        fontSize: "13px",
-        color: "rgba(255,255,255,0.7)"
-      }}>
-        Luxury Hair & Color
-      </p>
-
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-        fontSize: "12px",
-        color: "#9ff0b8"
-      }}>
-        ● Live
-      </div>
-    </div>
-
-    {/* BUTTON */}
-    <button className="cu-secondary-btn">
-      Ansehen
-    </button>
-  </div>
-</div>
-            <section className="cu-grid">
               <div className="cu-card cu-hero">
                 <div className="cu-hero-head">
-                  <div>
+                  <div style={{ flex: 1 }}>
                     <span className="cu-mini-badge">Willkommen zurück</span>
                     <h2>Hallo {customer.firstName}, dein digitaler Haarpass ist bereit.</h2>
                     <p className="cu-muted">
                       Pflege dein Haarprofil, speichere deinen Verlauf, sammle Inspirationen
                       und bereite den nächsten Termin sauber vor.
                     </p>
+
+                    <div
+                      className="cu-card cu-card-padding"
+                      style={{ marginTop: 16, background: "rgba(255,255,255,0.035)" }}
+                    >
+                      <span className="cu-mini-badge">Dein Salon</span>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: 14,
+                          marginTop: 14,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                          <div
+                            style={{
+                              width: 58,
+                              height: 58,
+                              borderRadius: 16,
+                              background: "linear-gradient(135deg, #d4af37, #e8cb73)",
+                              color: "#121212",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: 800,
+                              fontSize: 18,
+                              boxShadow: "0 10px 20px rgba(212,175,55,0.18)",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {SALON_PROFILE.logoText}
+                          </div>
+
+                          <div>
+                            <h3 style={{ margin: 0, fontSize: 18 }}>{SALON_PROFILE.name}</h3>
+                            <p
+                              style={{
+                                margin: "4px 0",
+                                color: "rgba(255,255,255,0.72)",
+                                fontSize: 14,
+                              }}
+                            >
+                              {SALON_PROFILE.subtitle}
+                            </p>
+
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                                fontSize: 13,
+                                color: "#9ff0b8",
+                                fontWeight: 700,
+                              }}
+                            >
+                              <span>●</span>
+                              <span>{SALON_PROFILE.status}</span>
+                            </div>
+
+                            <p
+                              style={{
+                                margin: "6px 0 0 0",
+                                color: "rgba(255,255,255,0.66)",
+                                fontSize: 13,
+                              }}
+                            >
+                              {SALON_PROFILE.openingShort}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button className="cu-secondary-btn">Salon ansehen</button>
+                      </div>
+                    </div>
+
+                    <div className="cu-actions">
+                      <button className="cu-secondary-btn" onClick={() => setActiveTab("profile")}>
+                        Profil öffnen
+                      </button>
+                      <button className="cu-secondary-btn" onClick={() => setActiveTab("history")}>
+                        Verlauf ansehen
+                      </button>
+                      <button className="cu-secondary-btn" onClick={() => setActiveTab("inspiration")}>
+                        Inspirationen
+                      </button>
+                    </div>
                   </div>
-{/* MEIN SALON FIX */}
-<div className="cu-card cu-card-padding" style={{ marginTop: "16px" }}>
-  <span className="cu-mini-badge">Dein Salon</span>
 
-  <div style={{
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "14px",
-    marginTop: "14px"
-  }}>
-    
-    <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-      
-      <div style={{
-        width: "52px",
-        height: "52px",
-        borderRadius: "14px",
-        background: "linear-gradient(135deg, #d4af37, #e8cb73)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontWeight: "800",
-        color: "#111"
-      }}>
-        HP
-      </div>
-
-      <div>
-        <h3 style={{ margin: 0 }}>Hair Pass Studio</h3>
-        <p style={{ margin: "4px 0", fontSize: "13px", opacity: 0.7 }}>
-          Luxury Hair & Color
-        </p>
-
-        <div style={{ color: "#9ff0b8", fontSize: "12px" }}>
-          ● Live verbunden
-        </div>
-      </div>
-    </div>
-
-    <button className="cu-secondary-btn">
-      Öffnen
-    </button>
-  </div>
-</div>
                   <button
                     className="cu-primary-btn"
                     onClick={() => {
@@ -1338,18 +1250,6 @@ export default function CustomerApp({
                     }}
                   >
                     Termin starten
-                  </button>
-                </div>
-
-                <div className="cu-actions">
-                  <button className="cu-secondary-btn" onClick={() => setActiveTab("profile")}>
-                    Profil öffnen
-                  </button>
-                  <button className="cu-secondary-btn" onClick={() => setActiveTab("history")}>
-                    Verlauf ansehen
-                  </button>
-                  <button className="cu-secondary-btn" onClick={() => setActiveTab("inspiration")}>
-                    Inspirationen
                   </button>
                 </div>
               </div>
@@ -1371,28 +1271,48 @@ export default function CustomerApp({
                 </div>
 
                 <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Bewertung</span>
-                  <span className="cu-stat-value">⭐ {averageRating}</span>
+                  <span className="cu-mini-badge">Inspirationen</span>
+                  <span className="cu-stat-value">{inspirations.length}</span>
                 </div>
               </div>
 
               <div className="cu-grid-2">
                 <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Öffnungszeiten</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Hair Pass Studio</h3>
-                  <div className="cu-hours-list">
-                    {OPENING_HOURS.map((item) => (
-                      <div key={item.day} className="cu-hours-row">
-                        <strong style={{ fontSize: 14 }}>{item.day}</strong>
-                        <span style={{ color: "rgba(255,255,255,0.78)", fontSize: 14 }}>{item.value}</span>
-                      </div>
-                    ))}
-                  </div>
+                  <span className="cu-mini-badge">Bestätigte Termine</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Vom Salon bestätigt</h3>
+
+                  {!confirmedRequests || confirmedRequests.length === 0 ? (
+                    <p className="cu-muted" style={{ marginBottom: 0 }}>
+                      Noch keine bestätigten Termine.
+                    </p>
+                  ) : (
+                    <div className="cu-request-list" style={{ marginTop: 14 }}>
+                      {confirmedRequests.map((request) => (
+                        <div key={request.id} className="cu-request-item">
+                          <div className="cu-request-top">
+                            <div>
+                              <strong>{request.mainService}</strong>
+                              <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
+                                {request.preferredDate}
+                                {request.preferredTime ? ` um ${request.preferredTime}` : ""}
+                              </p>
+                            </div>
+                            <span className="cu-request-status">{request.status}</span>
+                          </div>
+
+                          <div className="cu-summary-block">
+                            <span className="cu-summary-label">Wunschfriseur</span>
+                            <p className="cu-summary-text">{request.preferredStylist || "Egal"}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="cu-card cu-card-padding">
                   <span className="cu-mini-badge">Synchronisierte Anfragen</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Dein aktueller Status</h3>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Dein nächster Termin</h3>
 
                   {!sharedRequests || sharedRequests.length === 0 ? (
                     <p className="cu-muted" style={{ marginBottom: 0 }}>
@@ -1428,35 +1348,6 @@ export default function CustomerApp({
                   )}
                 </div>
               </div>
-
-              {!!confirmedRequests?.length && (
-                <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Bestätigte Termine</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Vom Salon bestätigt</h3>
-
-                  <div className="cu-request-list" style={{ marginTop: 14 }}>
-                    {confirmedRequests.map((request) => (
-                      <div key={request.id} className="cu-request-item">
-                        <div className="cu-request-top">
-                          <div>
-                            <strong>{request.mainService}</strong>
-                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
-                              {request.preferredDate}
-                              {request.preferredTime ? ` um ${request.preferredTime}` : ""}
-                            </p>
-                          </div>
-                          <span className="cu-request-status">{request.status}</span>
-                        </div>
-
-                        <div className="cu-summary-block">
-                          <span className="cu-summary-label">Wunschfriseur</span>
-                          <p className="cu-summary-text">{request.preferredStylist || "Egal"}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </section>
           )}
 
@@ -1478,38 +1369,22 @@ export default function CustomerApp({
 
                   <div className="cu-form-group">
                     <label className="cu-label">Vorname</label>
-                    <input
-                      className="cu-input"
-                      value={customer.firstName}
-                      onChange={(e) => updateCustomer("firstName", e.target.value)}
-                    />
+                    <input className="cu-input" value={customer.firstName} onChange={(e) => updateCustomer("firstName", e.target.value)} />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Nachname</label>
-                    <input
-                      className="cu-input"
-                      value={customer.lastName}
-                      onChange={(e) => updateCustomer("lastName", e.target.value)}
-                    />
+                    <input className="cu-input" value={customer.lastName} onChange={(e) => updateCustomer("lastName", e.target.value)} />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">E-Mail</label>
-                    <input
-                      className="cu-input"
-                      value={customer.email}
-                      onChange={(e) => updateCustomer("email", e.target.value)}
-                    />
+                    <input className="cu-input" value={customer.email} onChange={(e) => updateCustomer("email", e.target.value)} />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Telefon</label>
-                    <input
-                      className="cu-input"
-                      value={customer.phone}
-                      onChange={(e) => updateCustomer("phone", e.target.value)}
-                    />
+                    <input className="cu-input" value={customer.phone} onChange={(e) => updateCustomer("phone", e.target.value)} />
                   </div>
                 </div>
 
@@ -1528,9 +1403,7 @@ export default function CustomerApp({
                             onClick={() => updateHairProfile("hairLength", value)}
                             className="cu-extra-btn"
                             style={{
-                              border: active
-                                ? "1px solid rgba(212,175,55,0.35)"
-                                : "1px solid rgba(255,255,255,0.10)",
+                              border: active ? "1px solid rgba(212,175,55,0.35)" : "1px solid rgba(255,255,255,0.10)",
                               background: active
                                 ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
                                 : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
@@ -1556,9 +1429,7 @@ export default function CustomerApp({
                             onClick={() => updateHairProfile("hairStructure", value)}
                             className="cu-extra-btn"
                             style={{
-                              border: active
-                                ? "1px solid rgba(212,175,55,0.35)"
-                                : "1px solid rgba(255,255,255,0.10)",
+                              border: active ? "1px solid rgba(212,175,55,0.35)" : "1px solid rgba(255,255,255,0.10)",
                               background: active
                                 ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
                                 : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
@@ -1574,52 +1445,28 @@ export default function CustomerApp({
 
                   <div className="cu-form-group">
                     <label className="cu-label">Aktuelle Haarfarbe</label>
-                    <input
-                      className="cu-input"
-                      value={hairProfile.currentHairColor}
-                      onChange={(e) => updateHairProfile("currentHairColor", e.target.value)}
-                    />
+                    <input className="cu-input" value={hairProfile.currentHairColor} onChange={(e) => updateHairProfile("currentHairColor", e.target.value)} />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Frühere Behandlungen</label>
-                    <textarea
-                      className="cu-textarea"
-                      value={hairProfile.previousTreatments}
-                      onChange={(e) => updateHairProfile("previousTreatments", e.target.value)}
-                    />
+                    <textarea className="cu-textarea" value={hairProfile.previousTreatments} onChange={(e) => updateHairProfile("previousTreatments", e.target.value)} />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Allergien / Hinweise</label>
-                    <textarea
-                      className="cu-textarea"
-                      value={hairProfile.allergies}
-                      onChange={(e) => updateHairProfile("allergies", e.target.value)}
-                    />
+                    <textarea className="cu-textarea" value={hairProfile.allergies} onChange={(e) => updateHairProfile("allergies", e.target.value)} />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Persönliche Notizen</label>
-                    <textarea
-                      className="cu-textarea"
-                      value={hairProfile.notes}
-                      onChange={(e) => updateHairProfile("notes", e.target.value)}
-                    />
+                    <textarea className="cu-textarea" value={hairProfile.notes} onChange={(e) => updateHairProfile("notes", e.target.value)} />
                   </div>
                 </div>
               </div>
 
               <div className="cu-save-box">
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
+                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
                     <span className="cu-mini-badge">Profil</span>
                     <p className="cu-muted" style={{ margin: "10px 0 0 0", fontSize: "13px" }}>
@@ -1632,11 +1479,7 @@ export default function CustomerApp({
                   </button>
                 </div>
 
-                {profileSaved ? (
-                  <div className="cu-save-success">
-                    Dein Haarprofil wurde gespeichert.
-                  </div>
-                ) : null}
+                {profileSaved ? <div className="cu-save-success">Dein Haarprofil wurde gespeichert.</div> : null}
               </div>
             </section>
           )}
@@ -1660,12 +1503,7 @@ export default function CustomerApp({
               <div className="cu-grid">
                 {hairHistory.map((item) => (
                   <div key={item.id} className="cu-card">
-                    <HistoryVisual
-                      title={item.title}
-                      subtitle={item.date}
-                      colorA={item.colorA}
-                      colorB={item.colorB}
-                    />
+                    <HistoryVisual title={item.title} subtitle={item.date} colorA={item.colorA} colorB={item.colorB} />
                     <div className="cu-card-padding">
                       <span className="cu-mini-badge">{item.date}</span>
 
@@ -1710,11 +1548,11 @@ export default function CustomerApp({
                 {inspirations.map((item) => (
                   <div key={item.id} className="cu-card" style={{ overflow: "hidden" }}>
                     <InspirationVisual
-  title={item.title}
-  subtitle={item.subtitle}
-  category={item.category}
-  image={item.image}
-/>
+                      title={item.title}
+                      subtitle={item.subtitle}
+                      category={item.category}
+                      image={item.image}
+                    />
                     <div className="cu-card-padding">
                       <div className="cu-summary-block" style={{ marginTop: 0 }}>
                         <span className="cu-summary-label">Beschreibung</span>
@@ -1722,10 +1560,7 @@ export default function CustomerApp({
                       </div>
 
                       <div className="cu-actions">
-                        <button
-                          className="cu-primary-btn"
-                          onClick={() => handleUseInspiration(item)}
-                        >
+                        <button className="cu-primary-btn" onClick={() => handleUseInspiration(item)}>
                           Als Wunschlook wählen
                         </button>
                       </div>
@@ -1756,9 +1591,7 @@ export default function CustomerApp({
                     {MAIN_SERVICES.map((service) => (
                       <button
                         key={service.id}
-                        className={`cu-service-btn ${
-                          appointmentPrep.selectedMainService === service.id ? "active" : ""
-                        }`}
+                        className={`cu-service-btn ${appointmentPrep.selectedMainService === service.id ? "active" : ""}`}
                         onClick={() => updateAppointment("selectedMainService", service.id)}
                       >
                         <div className="cu-service-top">
@@ -1776,9 +1609,7 @@ export default function CustomerApp({
                     {EXTRA_SERVICES.map((extra) => (
                       <button
                         key={extra.id}
-                        className={`cu-extra-btn ${
-                          appointmentPrep.selectedExtras.includes(extra.id) ? "active" : ""
-                        }`}
+                        className={`cu-extra-btn ${appointmentPrep.selectedExtras.includes(extra.id) ? "active" : ""}`}
                         onClick={() => toggleExtra(extra.id)}
                       >
                         {extra.name}
@@ -1809,9 +1640,7 @@ export default function CustomerApp({
                               onClick={() => updateAppointment("preferredStylist", stylist)}
                               className="cu-extra-btn"
                               style={{
-                                border: active
-                                  ? "1px solid rgba(212,175,55,0.35)"
-                                  : "1px solid rgba(255,255,255,0.10)",
+                                border: active ? "1px solid rgba(212,175,55,0.35)" : "1px solid rgba(255,255,255,0.10)",
                                 background: active
                                   ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
                                   : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
@@ -1827,22 +1656,12 @@ export default function CustomerApp({
 
                     <div className="cu-form-group">
                       <label className="cu-label">Wunschdatum</label>
-                      <input
-                        className="cu-input"
-                        type="date"
-                        value={appointmentPrep.preferredDate}
-                        onChange={(e) => updateAppointment("preferredDate", e.target.value)}
-                      />
+                      <input className="cu-input" type="date" value={appointmentPrep.preferredDate} onChange={(e) => updateAppointment("preferredDate", e.target.value)} />
                     </div>
 
                     <div className="cu-form-group">
                       <label className="cu-label">Wunschzeit</label>
-                      <input
-                        className="cu-input"
-                        type="time"
-                        value={appointmentPrep.preferredTime}
-                        onChange={(e) => updateAppointment("preferredTime", e.target.value)}
-                      />
+                      <input className="cu-input" type="time" value={appointmentPrep.preferredTime} onChange={(e) => updateAppointment("preferredTime", e.target.value)} />
                     </div>
 
                     <div className="cu-form-group cu-full-width">
@@ -1865,9 +1684,7 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hauptleistung</span>
-                    <p className="cu-summary-text">
-                      {selectedMainService?.name || "Nicht gewählt"}
-                    </p>
+                    <p className="cu-summary-text">{selectedMainService?.name || "Nicht gewählt"}</p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -1885,16 +1702,12 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschlook</span>
-                    <p className="cu-summary-text">
-                      {appointmentPrep.desiredLook || "Keine Angabe"}
-                    </p>
+                    <p className="cu-summary-text">{appointmentPrep.desiredLook || "Keine Angabe"}</p>
                   </div>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschfriseur</span>
-                    <p className="cu-summary-text">
-                      {appointmentPrep.preferredStylist || "Egal"}
-                    </p>
+                    <p className="cu-summary-text">{appointmentPrep.preferredStylist || "Egal"}</p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -1907,9 +1720,7 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hinweise an den Salon</span>
-                    <p className="cu-summary-text">
-                      {appointmentPrep.importantNote || "Keine Angabe"}
-                    </p>
+                    <p className="cu-summary-text">{appointmentPrep.importantNote || "Keine Angabe"}</p>
                   </div>
 
                   <div className="cu-actions">
@@ -1959,11 +1770,7 @@ export default function CustomerApp({
                     </button>
                   </div>
 
-                  {reviewSaved ? (
-                    <div className="cu-save-success">
-                      Deine Bewertung wurde gespeichert.
-                    </div>
-                  ) : null}
+                  {reviewSaved ? <div className="cu-save-success">Deine Bewertung wurde gespeichert.</div> : null}
                 </div>
 
                 <div className="cu-card cu-card-padding">
@@ -1979,9 +1786,7 @@ export default function CustomerApp({
                         <div className="cu-request-top">
                           <div>
                             <strong>{item.customerName}</strong>
-                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
-                              {item.date}
-                            </p>
+                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>{item.date}</p>
                           </div>
                           <span className="cu-request-status">⭐ {item.rating}</span>
                         </div>
@@ -2040,9 +1845,7 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hauptleistung</span>
-                    <p className="cu-summary-text">
-                      {selectedMainService?.name || "Nicht gewählt"}
-                    </p>
+                    <p className="cu-summary-text">{selectedMainService?.name || "Nicht gewählt"}</p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -2060,16 +1863,12 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschlook</span>
-                    <p className="cu-summary-text">
-                      {appointmentPrep.desiredLook || "Keine Angabe"}
-                    </p>
+                    <p className="cu-summary-text">{appointmentPrep.desiredLook || "Keine Angabe"}</p>
                   </div>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschfriseur</span>
-                    <p className="cu-summary-text">
-                      {appointmentPrep.preferredStylist || "Egal"}
-                    </p>
+                    <p className="cu-summary-text">{appointmentPrep.preferredStylist || "Egal"}</p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -2082,9 +1881,7 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hinweise an den Salon</span>
-                    <p className="cu-summary-text">
-                      {appointmentPrep.importantNote || "Keine Angabe"}
-                    </p>
+                    <p className="cu-summary-text">{appointmentPrep.importantNote || "Keine Angabe"}</p>
                   </div>
 
                   <div className="cu-actions">

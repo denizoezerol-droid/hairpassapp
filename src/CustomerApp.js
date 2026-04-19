@@ -1328,7 +1328,7 @@ export default function CustomerApp({
           <div className="cu-topbar">
             <div>
               <span className="cu-brand-badge">Hair Pass · Kunde</span>
-              <h1 className="cu-brand-title">Kundenbereich</h1>
+              <h1 className="cu-brand-title">KUNDENBEREICH TEST 999</h1>
               <p className="cu-subtitle">
                 Verwalte deinen digitalen Haarpass, deine Wunschlooks und bereite
                 deinen nächsten Termin in einer luxuriösen, klaren Übersicht vor.

@@ -125,14 +125,13 @@ function InspirationVisual({ title, subtitle, category, image }) {
   return (
     <div
       style={{
-        minHeight: 260,
-        borderRadius: "20px 20px 0 0",
-        overflow: "hidden",
+        minHeight: 280,
         position: "relative",
+        overflow: "hidden",
+        borderRadius: "20px 20px 0 0",
         background: "#111",
       }}
     >
-      {/* BILD */}
       {image ? (
         <img
           src={image}
@@ -140,40 +139,61 @@ function InspirationVisual({ title, subtitle, category, image }) {
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover"
+            objectFit: "cover",
+            display: "block",
           }}
         />
       ) : (
-        <div style={{
-          width: "100%",
-          height: "100%",
-          background: "linear-gradient(135deg,#333,#111)"
-        }} />
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            background:
+              "linear-gradient(135deg, rgba(212,175,55,0.22), rgba(17,17,17,1))",
+          }}
+        />
       )}
 
-      {/* OVERLAY */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.6))",
+            "linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.58))",
         }}
       />
 
-      {/* TEXT */}
       <div
         style={{
           position: "absolute",
-          bottom: "14px",
-          left: "14px",
-          right: "14px",
+          left: 18,
+          right: 18,
+          bottom: 18,
         }}
       >
-        <div className="cu-mini-badge">{category}</div>
+        <div
+          style={{
+            display: "inline-flex",
+            minHeight: 34,
+            alignItems: "center",
+            padding: "7px 12px",
+            borderRadius: 999,
+            background: "rgba(0,0,0,0.34)",
+            border: "1px solid rgba(255,255,255,0.10)",
+            fontWeight: 800,
+            fontSize: 12,
+            color: "#fff",
+            backdropFilter: "blur(10px)",
+          }}
+        >
+          {category}
+        </div>
 
-        <h3 style={{ margin: "8px 0 4px" }}>{title}</h3>
-        <p style={{ margin: 0, fontSize: "13px", opacity: 0.9 }}>
+        <h3 style={{ margin: "12px 0 6px", fontSize: 24, color: "#fff" }}>
+          {title}
+        </h3>
+
+        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.88)" }}>
           {subtitle}
         </p>
       </div>
@@ -988,16 +1008,22 @@ export default function CustomerApp({
   };
 
   const addDemoInspiration = () => {
-    const next = {
-      id: `inspo-${Date.now()}`,
-      title: `Neue Luxus-Inspiration ${inspirations.length + 1}`,
-      subtitle: "Neue Richtung für deinen nächsten Termin",
-      category: "Luxury Look",
-      colorA: "#7b5a2f",
-      colorB: "#171717",
-    };
-    setInspirations((prev) => [next, ...prev]);
+  const demoImages = [
+    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=1200&q=80",
+  ];
+
+  const next = {
+    id: `inspo-${Date.now()}`,
+    title: `Neue Luxus-Inspiration ${inspirations.length + 1}`,
+    subtitle: "Neue Richtung für deinen nächsten Termin",
+    category: "Luxury Look",
+    image: demoImages[inspirations.length % demoImages.length],
   };
+
+  setInspirations((prev) => [next, ...prev]);
+};
 
   const handleSaveProfile = () => {
     unlockAudio();

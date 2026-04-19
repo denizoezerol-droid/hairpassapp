@@ -1,4 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { supabase } from "./supabaseClient";
+
+const SALON_ID = "0c053665-32be-414a-9f34-176b768139e7";
 
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard" },
@@ -189,6 +192,17 @@ export default function SalonApp({
   sharedRequests = [],
   onUpdateRequestStatus,
 }) {
+  const [salonProfile, setSalonProfile] = useState({
+  salonName: "",
+  email: "",
+  phone: "",
+  address: "",
+  description: "",
+});
+
+const [openingHours, setOpeningHours] = useState([]);
+const [priceList, setPriceList] = useState([]);
+const [stylists, setStylists] = useState([]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [customers, setCustomers] = useState(DEMO_CUSTOMERS);
   const [selectedCustomerId, setSelectedCustomerId] = useState(DEMO_CUSTOMERS[0].id);

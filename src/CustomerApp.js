@@ -73,16 +73,24 @@ const INITIAL_INSPIRATIONS = [
     title: "Soft Glow Bob",
     subtitle: "Natürlicher, eleganter Look",
     category: "Bob · Soft Finish",
-    colorA: "#4f3516",
-    colorB: "#111111",
+    image:
+      "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&w=1200&q=80",
   },
   {
     id: "inspo-2",
     title: "Warme Balayage",
     subtitle: "Weicher, luxuriöser Verlauf",
     category: "Color · Luxury Blend",
-    colorA: "#6a4923",
-    colorB: "#161616",
+    image:
+      "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: "inspo-3",
+    title: "Elegante Hochsteckfrisur",
+    subtitle: "Perfekt für Events und besondere Abende",
+    category: "Updo · Elegant",
+    image:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=80",
   },
 ];
 

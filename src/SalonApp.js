@@ -614,18 +614,23 @@ const showPopupMessage = (message, tone = null) => {
     .slice(0, 3);
 
   useEffect(() => {
-    if (openRequests.length > 0) {
-      const newest = openRequests[0];
-      setPopup({
-        visible: true,
-        message: `Neue Anfrage von ${newest.customerName}.`,
-      });
-      const t = setTimeout(() => {
-        setPopup({ visible: false, message: "" });
-      }, 2200);
-      return () => clearTimeout(t);
-    }
-  }, [sharedRequests.length]); // eslint-disable-line
+  const requestIds = (sharedRequests || []).map((item) => item.id);
+
+  if (previousRequestIdsRef.current.length === 0) {
+    previousRequestIdsRef.current = requestIds;
+    return;
+  }
+
+  const newestRequest = requestsWithCustomer.find(
+    (item) => !previousRequestIdsRef.current.includes(item.id)
+  );
+
+  if (newestRequest) {
+    showPopupMessage(`Neue Anfrage von ${newestRequest.customerName}.`, "default");
+  }
+
+  previousRequestIdsRef.current = requestIds;
+}, [sharedRequests, requestsWithCustomer]);
 
   const saveSalonNote = () => {
     if (!salonNote.trim()) return;
@@ -644,18 +649,18 @@ const showPopupMessage = (message, tone = null) => {
   };
 
   const handleUpdateStatus = (requestId, status, customerName, mainService) => {
-    if (typeof onUpdateRequestStatus === "function") {
-      onUpdateRequestStatus(requestId, status);
-    }
+  unlockAudio();
 
-    if (status === "Bestätigt") {
-      setPopup({
-        visible: true,
-        message: `${mainService} für ${customerName} wurde bestätigt.`,
-      });
-      setTimeout(() => setPopup({ visible: false, message: "" }), 2400);
-    }
-  };
+  if (typeof onUpdateRequestStatus === "function") {
+    onUpdateRequestStatus(requestId, status);
+  }
+
+  if (status === "Bestätigt") {
+    showPopupMessage(`${mainService} für ${customerName} wurde bestätigt.`, "confirmed");
+  } else if (status === "Erledigt") {
+    showPopupMessage(`${mainService} für ${customerName} wurde abgeschlossen.`, "default");
+  }
+};
 
   return (
     <>
@@ -671,7 +676,13 @@ const showPopupMessage = (message, tone = null) => {
               </p>
             </div>
 
-            <button className="sa-logout-btn" onClick={onLogout}>
+            <button
+  className="sa-logout-btn"
+  onClick={() => {
+    unlockAudio();
+    onLogout();
+  }}
+>
               Logout
             </button>
           </div>
@@ -681,7 +692,10 @@ const showPopupMessage = (message, tone = null) => {
               <button
                 key={item.id}
                 className={`sa-nav-btn ${activeTab === item.id ? "active" : ""}`}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+  unlockAudio();
+  setActiveTab(item.id);
+}}
               >
                 {item.label}
               </button>

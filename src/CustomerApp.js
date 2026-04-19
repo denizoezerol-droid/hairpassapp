@@ -1666,12 +1666,11 @@ export default function CustomerApp({
                 {inspirations.map((item) => (
                   <div key={item.id} className="cu-card" style={{ overflow: "hidden" }}>
                     <InspirationVisual
-                      title={item.title}
-                      subtitle={item.subtitle}
-                      category={item.category}
-                      colorA={item.colorA}
-                      colorB={item.colorB}
-                    />
+  title={item.title}
+  subtitle={item.subtitle}
+  category={item.category}
+  image={item.image}
+/>
                     <div className="cu-card-padding">
                       <div className="cu-summary-block" style={{ marginTop: 0 }}>
                         <span className="cu-summary-label">Beschreibung</span>

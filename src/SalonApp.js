@@ -194,13 +194,6 @@ export default function SalonApp({
 }) {
   alert("SALON TEST AKTIV");
   
-  const [salonProfile, setSalonProfile] = useState({
-  salonName: "",
-  email: "",
-  phone: "",
-  address: "",
-  description: "",
-});
 
 const [openingHours, setOpeningHours] = useState([]);
 const [priceList, setPriceList] = useState([]);

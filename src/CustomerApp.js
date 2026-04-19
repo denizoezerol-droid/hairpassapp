@@ -125,10 +125,10 @@ function InspirationVisual({ title, subtitle, category, image }) {
   return (
     <div
       style={{
-        minHeight: 280,
+        minHeight: 320,
         position: "relative",
         overflow: "hidden",
-        borderRadius: "20px 20px 0 0",
+        borderRadius: "22px 22px 0 0",
         background: "#111",
       }}
     >
@@ -141,6 +141,7 @@ function InspirationVisual({ title, subtitle, category, image }) {
             height: "100%",
             objectFit: "cover",
             display: "block",
+            transform: "scale(1.01)",
           }}
         />
       ) : (
@@ -159,15 +160,15 @@ function InspirationVisual({ title, subtitle, category, image }) {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.58))",
+            "linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.62))",
         }}
       />
 
       <div
         style={{
           position: "absolute",
-          left: 18,
-          right: 18,
+          left: 20,
+          right: 20,
           bottom: 18,
         }}
       >
@@ -184,16 +185,26 @@ function InspirationVisual({ title, subtitle, category, image }) {
             fontSize: 12,
             color: "#fff",
             backdropFilter: "blur(10px)",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
           }}
         >
           {category}
         </div>
 
-        <h3 style={{ margin: "12px 0 6px", fontSize: 24, color: "#fff" }}>
+        <h3
+          style={{
+            margin: "12px 0 6px",
+            fontSize: 28,
+            color: "#fff",
+            letterSpacing: "-0.03em",
+            fontFamily:
+              '"Playfair Display", "Cormorant Garamond", Georgia, serif',
+          }}
+        >
           {title}
         </h3>
 
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.88)" }}>
+        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.90)" }}>
           {subtitle}
         </p>
       </div>
@@ -205,7 +216,7 @@ function HistoryVisual({ title, subtitle, colorA = "#2a2a2a", colorB = "#141414"
   return (
     <div
       style={{
-        minHeight: 150,
+        minHeight: 160,
         position: "relative",
         overflow: "hidden",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -233,7 +244,7 @@ function HistoryVisual({ title, subtitle, colorA = "#2a2a2a", colorB = "#141414"
             display: "inline-flex",
             padding: "7px 11px",
             borderRadius: 999,
-            background: "rgba(0,0,0,0.26)",
+            background: "rgba(0,0,0,0.28)",
             border: "1px solid rgba(255,255,255,0.08)",
             fontWeight: 700,
             fontSize: 12,
@@ -263,10 +274,11 @@ function StarRow({ value, onChange, readOnly = false }) {
             border: "none",
             background: "transparent",
             color: star <= value ? "#e8cb73" : "rgba(255,255,255,0.24)",
-            fontSize: 26,
+            fontSize: 28,
             cursor: readOnly ? "default" : "pointer",
             padding: 0,
             lineHeight: 1,
+            textShadow: star <= value ? "0 0 14px rgba(232,203,115,0.28)" : "none",
           }}
         >
           ★
@@ -338,11 +350,29 @@ export default function CustomerApp({
   }, [currentUser]);
 
   useEffect(() => {
-    const existing = document.getElementById("hairpass-customer-dynamic-final");
+    const existing = document.getElementById("hairpass-customer-luxury-styles");
     if (existing) return;
 
+    const linkPreconnect1 = document.createElement("link");
+    linkPreconnect1.rel = "preconnect";
+    linkPreconnect1.href = "https://fonts.googleapis.com";
+
+    const linkPreconnect2 = document.createElement("link");
+    linkPreconnect2.rel = "preconnect";
+    linkPreconnect2.href = "https://fonts.gstatic.com";
+    linkPreconnect2.crossOrigin = "anonymous";
+
+    const linkFonts = document.createElement("link");
+    linkFonts.rel = "stylesheet";
+    linkFonts.href =
+      "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap";
+
+    document.head.appendChild(linkPreconnect1);
+    document.head.appendChild(linkPreconnect2);
+    document.head.appendChild(linkFonts);
+
     const style = document.createElement("style");
-    style.id = "hairpass-customer-dynamic-final";
+    style.id = "hairpass-customer-luxury-styles";
     style.innerHTML = `
       * { box-sizing: border-box; }
       html, body, #root {
@@ -354,9 +384,10 @@ export default function CustomerApp({
       body {
         font-family: Inter, Arial, sans-serif;
         background:
-          radial-gradient(circle at top left, rgba(212,175,55,0.08), transparent 24%),
+          radial-gradient(circle at top left, rgba(212,175,55,0.10), transparent 22%),
           radial-gradient(circle at top right, rgba(255,255,255,0.04), transparent 18%),
-          linear-gradient(135deg, #07080b 0%, #0d1117 45%, #07080b 100%);
+          radial-gradient(circle at bottom left, rgba(212,175,55,0.06), transparent 20%),
+          linear-gradient(135deg, #050608 0%, #0b1118 42%, #050608 100%);
         color: #f5f5f7;
       }
       button, input, textarea { font: inherit; }
@@ -364,47 +395,57 @@ export default function CustomerApp({
       .cu-shell { min-height: 100vh; width: 100%; }
       .cu-main {
         width: 100%;
-        max-width: 1180px;
+        max-width: 1240px;
         margin: 0 auto;
-        padding: 18px;
-        padding-bottom: 90px;
+        padding: 20px;
+        padding-bottom: 96px;
       }
+
       .cu-topbar {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 14px;
+        gap: 16px;
         margin-bottom: 18px;
       }
-      .cu-badge, .cu-mini-badge {
+
+      .cu-brand-badge, .cu-badge, .cu-mini-badge {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-height: 28px;
-        padding: 5px 11px;
+        min-height: 30px;
+        padding: 6px 12px;
         border-radius: 999px;
-        background: rgba(212,175,55,0.10);
-        border: 1px solid rgba(212,175,55,0.18);
-        color: #e4c15d;
+        border: 1px solid rgba(212,175,55,0.22);
+        background:
+          linear-gradient(135deg, rgba(212,175,55,0.12), rgba(255,255,255,0.03));
+        color: #e7c96a;
         font-size: 11px;
         font-weight: 800;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,0.05),
+          0 10px 24px rgba(0,0,0,0.16);
+        backdrop-filter: blur(12px);
       }
-      .cu-title {
-        margin: 10px 0 6px;
-        font-size: clamp(28px, 4.4vw, 44px);
-        line-height: 0.98;
-        font-weight: 800;
-        letter-spacing: -0.025em;
+
+      .cu-brand-title {
+        margin: 12px 0 6px;
+        font-family: "Playfair Display", Georgia, serif;
+        font-size: clamp(36px, 5vw, 62px);
+        line-height: 0.95;
+        letter-spacing: -0.045em;
+        color: #fff;
+        text-shadow: 0 0 30px rgba(255,255,255,0.04);
       }
+
       .cu-subtitle {
         margin: 0;
         max-width: 760px;
-        color: rgba(255,255,255,0.74);
-        font-size: clamp(14px, 2.1vw, 18px);
-        line-height: 1.55;
+        color: rgba(255,255,255,0.76);
+        font-size: clamp(14px, 2vw, 18px);
+        line-height: 1.6;
       }
 
       .cu-primary-btn, .cu-secondary-btn, .cu-logout-btn, .cu-nav-btn, .cu-service-btn, .cu-extra-btn {
@@ -413,43 +454,52 @@ export default function CustomerApp({
       }
 
       .cu-primary-btn, .cu-secondary-btn, .cu-logout-btn {
-        min-height: 42px;
-        padding: 10px 14px;
-        border-radius: 14px;
+        min-height: 44px;
+        padding: 10px 16px;
+        border-radius: 15px;
         cursor: pointer;
         font-weight: 700;
         font-size: 13px;
       }
+
       .cu-primary-btn {
         border: none;
-        background: linear-gradient(135deg, #d4af37 0%, #e8cb73 100%);
-        color: #121212;
-        box-shadow: 0 8px 18px rgba(212,175,55,0.18);
+        background: linear-gradient(135deg, #d4af37 0%, #ecd584 100%);
+        color: #141414;
+        box-shadow:
+          0 10px 24px rgba(212,175,55,0.20),
+          0 0 28px rgba(212,175,55,0.08);
       }
+
       .cu-secondary-btn {
         border: 1px solid rgba(255,255,255,0.08);
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
         color: #fff;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
       }
+
       .cu-logout-btn {
         border: 1px solid rgba(255,80,80,0.22);
-        background: linear-gradient(135deg, rgba(110,18,18,0.32), rgba(70,8,8,0.88));
+        background: linear-gradient(135deg, rgba(120,18,18,0.34), rgba(72,10,10,0.92));
         color: #fff;
-        box-shadow: 0 8px 18px rgba(80,0,0,0.18);
+        box-shadow: 0 10px 24px rgba(80,0,0,0.20);
       }
 
       .cu-nav-wrap {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin-bottom: 18px;
+        margin: 18px 0 22px;
       }
+
       .cu-nav-btn {
-        min-height: 38px;
-        padding: 8px 12px;
+        min-height: 40px;
+        padding: 8px 13px;
         border-radius: 14px;
         border: 1px solid rgba(255,255,255,0.08);
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
         color: #fff;
         font-size: 13px;
         font-weight: 650;
@@ -457,78 +507,109 @@ export default function CustomerApp({
         white-space: nowrap;
         backdrop-filter: blur(10px);
       }
+
       .cu-nav-btn.active {
-        background: linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05));
+        background:
+          linear-gradient(135deg, rgba(212,175,55,0.18), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.34);
-        box-shadow: 0 0 0 1px rgba(255,255,255,0.03);
+        box-shadow:
+          0 0 0 1px rgba(255,255,255,0.03),
+          0 8px 24px rgba(212,175,55,0.08);
       }
 
       .cu-grid, .cu-grid-2, .cu-grid-3, .cu-grid-4, .cu-card-grid, .cu-appointment-layout, .cu-service-grid, .cu-form-grid {
         display: grid;
-        gap: 14px;
+        gap: 16px;
       }
       .cu-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .cu-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .cu-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .cu-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .cu-appointment-layout { grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.95fr); }
+      .cu-appointment-layout { grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr); }
       .cu-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .cu-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
       .cu-card {
         min-width: 0;
-        background: linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.025));
         border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 20px;
-        box-shadow: 0 14px 38px rgba(0,0,0,0.22);
+        border-radius: 24px;
+        box-shadow:
+          0 18px 44px rgba(0,0,0,0.24),
+          inset 0 1px 0 rgba(255,255,255,0.04);
         backdrop-filter: blur(16px);
         position: relative;
         overflow: hidden;
       }
+
       .cu-card::before {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent 35%);
+        background:
+          linear-gradient(180deg, rgba(255,255,255,0.05), transparent 32%);
         pointer-events: none;
       }
-      .cu-card-padding { padding: 14px; }
-      .cu-hero { padding: 16px; }
+
+      .cu-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at top left, rgba(212,175,55,0.06), transparent 26%);
+        pointer-events: none;
+      }
+
+      .cu-card-padding { padding: 18px; }
+      .cu-hero { padding: 20px; }
 
       .cu-hero-head, .cu-section-head {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 14px;
+        gap: 16px;
       }
+
       .cu-hero h2, .cu-section-title, .cu-card h3 { margin: 0; }
+
       .cu-hero h2 {
-        margin-top: 10px;
-        font-size: clamp(22px, 3.8vw, 32px);
-        line-height: 1.08;
+        margin-top: 12px;
+        font-size: clamp(30px, 4.2vw, 54px);
+        line-height: 0.98;
+        letter-spacing: -0.05em;
+        font-family: "Playfair Display", Georgia, serif;
+        color: #ffffff;
+        text-shadow: 0 0 28px rgba(255,255,255,0.04);
       }
+
       .cu-section-title {
         margin-top: 8px;
-        font-size: clamp(20px, 3.2vw, 28px);
-        line-height: 1.08;
+        font-size: clamp(22px, 3.2vw, 34px);
+        line-height: 1.02;
+        letter-spacing: -0.04em;
+        font-family: "Playfair Display", Georgia, serif;
       }
 
       .cu-muted {
-        color: rgba(255,255,255,0.74);
-        line-height: 1.55;
+        color: rgba(255,255,255,0.76);
+        line-height: 1.62;
         font-size: 14px;
       }
+
       .cu-actions {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
-        margin-top: 14px;
+        margin-top: 16px;
       }
+
       .cu-stat-value {
         display: block;
-        margin-top: 10px;
-        font-size: 20px;
+        margin-top: 12px;
+        font-size: 26px;
         font-weight: 800;
+        letter-spacing: -0.04em;
       }
 
       .cu-form-group {
@@ -536,54 +617,67 @@ export default function CustomerApp({
         flex-direction: column;
         gap: 7px;
       }
+
       .cu-form-group + .cu-form-group { margin-top: 14px; }
+
       .cu-label {
         font-size: 13px;
         color: rgba(255,255,255,0.78);
         font-weight: 600;
       }
+
       .cu-input, .cu-textarea {
         width: 100%;
-        min-height: 46px;
-        border-radius: 14px;
+        min-height: 48px;
+        border-radius: 15px;
         border: 1px solid rgba(255,255,255,0.09);
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         padding: 12px 14px;
         outline: none;
         font-size: 14px;
         backdrop-filter: blur(10px);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
       }
+
       .cu-textarea {
-        min-height: 104px;
+        min-height: 110px;
         resize: vertical;
       }
+
       .cu-full-width { grid-column: 1 / -1; }
 
       .cu-service-btn {
-        min-height: 88px;
+        min-height: 92px;
         text-align: left;
-        padding: 14px;
-        border-radius: 16px;
+        padding: 15px;
+        border-radius: 18px;
         border: 1px solid rgba(255,255,255,0.08);
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         cursor: pointer;
         backdrop-filter: blur(10px);
       }
+
       .cu-service-btn.active {
-        background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
+        background:
+          linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.35);
+        box-shadow: 0 10px 26px rgba(212,175,55,0.08);
       }
+
       .cu-service-top {
         display: flex;
         align-items: center;
         gap: 10px;
         margin-bottom: 8px;
       }
+
       .cu-service-icon {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -591,10 +685,12 @@ export default function CustomerApp({
         background: rgba(255,255,255,0.08);
         font-size: 16px;
       }
+
       .cu-service-name {
         font-size: 15px;
         font-weight: 800;
       }
+
       .cu-service-desc {
         font-size: 13px;
         color: rgba(255,255,255,0.72);
@@ -607,37 +703,54 @@ export default function CustomerApp({
         gap: 9px;
         margin-top: 12px;
       }
+
       .cu-extra-btn {
         min-height: 38px;
         padding: 8px 12px;
         border-radius: 999px;
         border: 1px solid rgba(255,255,255,0.10);
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
         backdrop-filter: blur(10px);
       }
+
       .cu-extra-btn.active {
-        background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
+        background:
+          linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.35);
         color: #efcf72;
+        box-shadow: 0 8px 20px rgba(212,175,55,0.08);
       }
-            .cu-summary-block + .cu-summary-block { margin-top: 14px; }
+    `;
+    document.head.appendChild(style);
+  }, []);
+    useEffect(() => {
+    const extraStyleId = "hairpass-customer-luxury-styles-2";
+    if (document.getElementById(extraStyleId)) return;
+
+    const style = document.createElement("style");
+    style.id = extraStyleId;
+    style.innerHTML = `
+      .cu-summary-block + .cu-summary-block { margin-top: 14px; }
+
       .cu-summary-label {
         display: block;
         margin-bottom: 7px;
         color: rgba(255,255,255,0.62);
         font-size: 11px;
         font-weight: 800;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.10em;
         text-transform: uppercase;
       }
+
       .cu-summary-text {
         margin: 0;
-        color: rgba(255,255,255,0.94);
-        line-height: 1.5;
+        color: rgba(255,255,255,0.95);
+        line-height: 1.55;
         font-size: 14px;
         word-break: break-word;
       }
@@ -647,11 +760,12 @@ export default function CustomerApp({
         flex-wrap: wrap;
         gap: 8px;
       }
+
       .cu-tag {
         display: inline-flex;
         align-items: center;
         min-height: 34px;
-        padding: 7px 10px;
+        padding: 7px 11px;
         border-radius: 999px;
         background: rgba(212,175,55,0.12);
         border: 1px solid rgba(212,175,55,0.18);
@@ -665,23 +779,27 @@ export default function CustomerApp({
         flex-direction: column;
         gap: 10px;
       }
+
       .cu-request-item {
-        padding: 14px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+        padding: 15px;
+        border-radius: 18px;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         border: 1px solid rgba(255,255,255,0.07);
         backdrop-filter: blur(12px);
       }
+
       .cu-request-top {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         gap: 10px;
       }
+
       .cu-request-status {
         display: inline-flex;
         align-items: center;
-        padding: 5px 9px;
+        padding: 5px 10px;
         border-radius: 999px;
         background: rgba(34,197,94,0.12);
         border: 1px solid rgba(34,197,94,0.18);
@@ -689,16 +807,18 @@ export default function CustomerApp({
         font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
       }
 
       .cu-save-box {
-        padding: 14px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+        padding: 16px;
+        border-radius: 18px;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         border: 1px solid rgba(255,255,255,0.07);
         backdrop-filter: blur(12px);
       }
+
       .cu-save-success {
         margin-top: 12px;
         padding: 12px 14px;
@@ -709,6 +829,7 @@ export default function CustomerApp({
         font-size: 13px;
         font-weight: 600;
       }
+
       .cu-error-box {
         margin-top: 12px;
         padding: 12px 14px;
@@ -724,6 +845,7 @@ export default function CustomerApp({
         gap: 8px;
         margin-top: 14px;
       }
+
       .cu-hours-row {
         display: flex;
         align-items: center;
@@ -731,8 +853,83 @@ export default function CustomerApp({
         gap: 12px;
         padding: 10px 12px;
         border-radius: 14px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
         border: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .cu-salon-card {
+        margin-top: 18px;
+        padding: 16px;
+        border-radius: 20px;
+        background:
+          linear-gradient(135deg, rgba(212,175,55,0.08), rgba(255,255,255,0.03));
+        border: 1px solid rgba(212,175,55,0.18);
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,0.04),
+          0 14px 36px rgba(0,0,0,0.18);
+        backdrop-filter: blur(16px);
+      }
+
+      .cu-salon-card-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .cu-salon-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .cu-salon-logo {
+        width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #d4af37, #ecd584);
+        color: #111;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 19px;
+        box-shadow:
+          0 12px 28px rgba(212,175,55,0.20),
+          0 0 20px rgba(212,175,55,0.06);
+        flex-shrink: 0;
+      }
+
+      .cu-salon-name {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+
+      .cu-salon-sub {
+        margin: 4px 0;
+        color: rgba(255,255,255,0.72);
+        font-size: 14px;
+      }
+
+      .cu-salon-live {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #9ff0b8;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .cu-salon-live-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #58df8e;
+        box-shadow: 0 0 12px rgba(88,223,142,0.55);
       }
 
       .cu-popup {
@@ -743,26 +940,30 @@ export default function CustomerApp({
         width: min(360px, calc(100vw - 28px));
         padding: 14px 16px;
         border-radius: 18px;
-        background: linear-gradient(135deg, rgba(17,20,27,0.82), rgba(10,12,18,0.90));
+        background:
+          linear-gradient(135deg, rgba(17,20,27,0.84), rgba(10,12,18,0.92));
         border: 1px solid rgba(212,175,55,0.24);
         box-shadow: 0 20px 50px rgba(0,0,0,0.34);
         color: #fff;
         backdrop-filter: blur(18px);
         animation: cuSlideIn 0.28s ease;
       }
+
       .cu-popup-title {
         font-size: 13px;
         font-weight: 800;
         color: #efcf72;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         margin-bottom: 6px;
       }
+
       .cu-popup-text {
         color: rgba(255,255,255,0.88);
         font-size: 14px;
         line-height: 1.45;
       }
+
       @keyframes cuSlideIn {
         from { opacity: 0; transform: translateY(-8px) scale(0.98); }
         to { opacity: 1; transform: translateY(0) scale(1); }
@@ -771,7 +972,7 @@ export default function CustomerApp({
       .cu-modal-backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.62);
+        background: rgba(0,0,0,0.64);
         backdrop-filter: blur(8px);
         display: flex;
         align-items: center;
@@ -779,26 +980,34 @@ export default function CustomerApp({
         padding: 14px;
         z-index: 1000;
       }
+
       .cu-modal {
         width: 100%;
-        max-width: 500px;
-        padding: 18px;
-        border-radius: 22px;
-        background: linear-gradient(135deg, rgba(17,20,27,0.92), rgba(10,12,18,0.98));
+        max-width: 520px;
+        padding: 20px;
+        border-radius: 24px;
+        background:
+          linear-gradient(135deg, rgba(17,20,27,0.94), rgba(10,12,18,0.98));
         border: 1px solid rgba(255,255,255,0.10);
         box-shadow: 0 24px 70px rgba(0,0,0,0.36);
         backdrop-filter: blur(18px);
       }
+
       .cu-modal h3 {
-        margin: 10px 0 10px;
-        font-size: 24px;
+        margin: 12px 0 10px;
+        font-size: 28px;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        font-family: "Playfair Display", Georgia, serif;
       }
+
       .cu-modal p {
         margin: 0;
         color: rgba(255,255,255,0.8);
-        line-height: 1.55;
+        line-height: 1.58;
         font-size: 14px;
       }
+
       .cu-modal-actions {
         display: flex;
         gap: 10px;
@@ -823,13 +1032,16 @@ export default function CustomerApp({
           padding: 14px;
           padding-bottom: 90px;
         }
+
         .cu-topbar, .cu-hero-head, .cu-section-head {
           flex-direction: column;
           align-items: stretch;
         }
+
         .cu-logout-btn, .cu-actions > *, .cu-modal-actions > * {
           width: 100%;
         }
+
         .cu-actions, .cu-modal-actions {
           flex-direction: column;
         }
@@ -841,27 +1053,38 @@ export default function CustomerApp({
           grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 8px;
         }
+
         .cu-nav-btn {
           width: 100%;
           min-height: 42px;
           text-align: center;
           white-space: normal;
         }
-        .cu-title { font-size: 31px; }
+
+        .cu-brand-title { font-size: 38px; }
         .cu-card-padding, .cu-hero, .cu-modal { padding: 14px; }
+
         .cu-request-top {
           flex-direction: column;
           align-items: flex-start;
         }
+
         .cu-popup {
           left: 14px;
           right: 14px;
           top: 14px;
           width: auto;
         }
+
+        .cu-salon-card-inner {
+          align-items: flex-start;
+        }
+
+        .cu-salon-left {
+          align-items: flex-start;
+        }
       }
     `;
-   
     document.head.appendChild(style);
   }, []);
 
@@ -957,8 +1180,6 @@ export default function CustomerApp({
     [appointmentPrep.selectedExtras]
   );
 
-  const latestRequest = sharedRequests?.[0] || null;
-
   const averageRating = useMemo(() => {
     if (!reviews.length) return "0.0";
     const total = reviews.reduce((sum, item) => sum + item.rating, 0);
@@ -1024,7 +1245,7 @@ export default function CustomerApp({
 
     setInspirations((prev) => [next, ...prev]);
   };
-  const handleSaveProfile = () => {
+    const handleSaveProfile = () => {
     unlockAudio();
     setProfileSaved(true);
     showPopupMessage("Profil gespeichert", "Dein Haarprofil wurde aktualisiert.");
@@ -1106,11 +1327,11 @@ export default function CustomerApp({
         <main className="cu-main">
           <div className="cu-topbar">
             <div>
-              <span className="cu-badge">Hair Pass · Kunde</span>
-              <h1 className="cu-title">Kundenbereich</h1>
+              <span className="cu-brand-badge">Hair Pass · Kunde</span>
+              <h1 className="cu-brand-title">Kundenbereich</h1>
               <p className="cu-subtitle">
                 Verwalte deinen digitalen Haarpass, deine Wunschlooks und bereite
-                deinen nächsten Termin sauber vor.
+                deinen nächsten Termin in einer luxuriösen, klaren Übersicht vor.
               </p>
             </div>
 
@@ -1147,76 +1368,30 @@ export default function CustomerApp({
                   <div style={{ flex: 1 }}>
                     <span className="cu-mini-badge">Willkommen zurück</span>
                     <h2>Hallo {customer.firstName}, dein digitaler Haarpass ist bereit.</h2>
-                    <p className="cu-muted">
-                      Pflege dein Haarprofil, speichere deinen Verlauf, sammle Inspirationen
-                      und bereite den nächsten Termin sauber vor.
+                    <p className="cu-muted" style={{ maxWidth: 860 }}>
+                      Pflege dein Haarprofil, speichere deinen Verlauf, sammle hochwertige
+                      Inspirationen und kommuniziere deinen Wunsch frühzeitig an deinen Salon.
                     </p>
 
-                    <div
-                      className="cu-card cu-card-padding"
-                      style={{ marginTop: 16, background: "rgba(255,255,255,0.035)" }}
-                    >
-                      <span className="cu-mini-badge">Dein Salon</span>
+                    <div className="cu-salon-card">
+                      <span className="cu-mini-badge">Mein Salon</span>
 
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: 14,
-                          marginTop: 14,
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                          <div
-                            style={{
-                              width: 58,
-                              height: 58,
-                              borderRadius: 16,
-                              background: "linear-gradient(135deg, #d4af37, #e8cb73)",
-                              color: "#121212",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              fontWeight: 800,
-                              fontSize: 18,
-                              boxShadow: "0 10px 20px rgba(212,175,55,0.18)",
-                              flexShrink: 0,
-                            }}
-                          >
-                            {SALON_PROFILE.logoText}
-                          </div>
+                      <div className="cu-salon-card-inner">
+                        <div className="cu-salon-left">
+                          <div className="cu-salon-logo">{SALON_PROFILE.logoText}</div>
 
                           <div>
-                            <h3 style={{ margin: 0, fontSize: 18 }}>{SALON_PROFILE.name}</h3>
-                            <p
-                              style={{
-                                margin: "4px 0",
-                                color: "rgba(255,255,255,0.72)",
-                                fontSize: 14,
-                              }}
-                            >
-                              {SALON_PROFILE.subtitle}
-                            </p>
+                            <h3 className="cu-salon-name">{SALON_PROFILE.name}</h3>
+                            <p className="cu-salon-sub">{SALON_PROFILE.subtitle}</p>
 
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                                fontSize: 13,
-                                color: "#9ff0b8",
-                                fontWeight: 700,
-                              }}
-                            >
-                              <span>●</span>
+                            <div className="cu-salon-live">
+                              <span className="cu-salon-live-dot" />
                               <span>{SALON_PROFILE.status}</span>
                             </div>
 
                             <p
                               style={{
-                                margin: "6px 0 0 0",
+                                margin: "7px 0 0 0",
                                 color: "rgba(255,255,255,0.66)",
                                 fontSize: 13,
                               }}
@@ -1280,7 +1455,9 @@ export default function CustomerApp({
               <div className="cu-grid-2">
                 <div className="cu-card cu-card-padding">
                   <span className="cu-mini-badge">Bestätigte Termine</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Vom Salon bestätigt</h3>
+                  <h3 style={{ marginTop: 12, fontSize: 22, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Vom Salon bestätigt
+                  </h3>
 
                   {!confirmedRequests || confirmedRequests.length === 0 ? (
                     <p className="cu-muted" style={{ marginBottom: 0 }}>
@@ -1313,7 +1490,9 @@ export default function CustomerApp({
 
                 <div className="cu-card cu-card-padding">
                   <span className="cu-mini-badge">Synchronisierte Anfragen</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Dein nächster Termin</h3>
+                  <h3 style={{ marginTop: 12, fontSize: 22, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Dein nächster Termin
+                  </h3>
 
                   {!sharedRequests || sharedRequests.length === 0 ? (
                     <p className="cu-muted" style={{ marginBottom: 0 }}>
@@ -1366,31 +1545,51 @@ export default function CustomerApp({
 
               <div className="cu-grid-2">
                 <div className="cu-card cu-card-padding">
-                  <h3 style={{ marginBottom: 16 }}>Kundendaten</h3>
+                  <h3 style={{ marginBottom: 16, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Kundendaten
+                  </h3>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Vorname</label>
-                    <input className="cu-input" value={customer.firstName} onChange={(e) => updateCustomer("firstName", e.target.value)} />
+                    <input
+                      className="cu-input"
+                      value={customer.firstName}
+                      onChange={(e) => updateCustomer("firstName", e.target.value)}
+                    />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Nachname</label>
-                    <input className="cu-input" value={customer.lastName} onChange={(e) => updateCustomer("lastName", e.target.value)} />
+                    <input
+                      className="cu-input"
+                      value={customer.lastName}
+                      onChange={(e) => updateCustomer("lastName", e.target.value)}
+                    />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">E-Mail</label>
-                    <input className="cu-input" value={customer.email} onChange={(e) => updateCustomer("email", e.target.value)} />
+                    <input
+                      className="cu-input"
+                      value={customer.email}
+                      onChange={(e) => updateCustomer("email", e.target.value)}
+                    />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Telefon</label>
-                    <input className="cu-input" value={customer.phone} onChange={(e) => updateCustomer("phone", e.target.value)} />
+                    <input
+                      className="cu-input"
+                      value={customer.phone}
+                      onChange={(e) => updateCustomer("phone", e.target.value)}
+                    />
                   </div>
                 </div>
 
                 <div className="cu-card cu-card-padding">
-                  <h3 style={{ marginBottom: 16 }}>Haarprofil</h3>
+                  <h3 style={{ marginBottom: 16, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Haarprofil
+                  </h3>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Haarlänge</label>
@@ -1404,9 +1603,11 @@ export default function CustomerApp({
                             onClick={() => updateHairProfile("hairLength", value)}
                             className="cu-extra-btn"
                             style={{
-                              border: active ? "1px solid rgba(212,175,55,0.35)" : "1px solid rgba(255,255,255,0.10)",
+                              border: active
+                                ? "1px solid rgba(212,175,55,0.35)"
+                                : "1px solid rgba(255,255,255,0.10)",
                               background: active
-                                ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
+                                ? "linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05))"
                                 : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
                               color: active ? "#efcf72" : "#fff",
                             }}
@@ -1430,9 +1631,11 @@ export default function CustomerApp({
                             onClick={() => updateHairProfile("hairStructure", value)}
                             className="cu-extra-btn"
                             style={{
-                              border: active ? "1px solid rgba(212,175,55,0.35)" : "1px solid rgba(255,255,255,0.10)",
+                              border: active
+                                ? "1px solid rgba(212,175,55,0.35)"
+                                : "1px solid rgba(255,255,255,0.10)",
                               background: active
-                                ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
+                                ? "linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05))"
                                 : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
                               color: active ? "#efcf72" : "#fff",
                             }}
@@ -1446,28 +1649,52 @@ export default function CustomerApp({
 
                   <div className="cu-form-group">
                     <label className="cu-label">Aktuelle Haarfarbe</label>
-                    <input className="cu-input" value={hairProfile.currentHairColor} onChange={(e) => updateHairProfile("currentHairColor", e.target.value)} />
+                    <input
+                      className="cu-input"
+                      value={hairProfile.currentHairColor}
+                      onChange={(e) => updateHairProfile("currentHairColor", e.target.value)}
+                    />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Frühere Behandlungen</label>
-                    <textarea className="cu-textarea" value={hairProfile.previousTreatments} onChange={(e) => updateHairProfile("previousTreatments", e.target.value)} />
+                    <textarea
+                      className="cu-textarea"
+                      value={hairProfile.previousTreatments}
+                      onChange={(e) => updateHairProfile("previousTreatments", e.target.value)}
+                    />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Allergien / Hinweise</label>
-                    <textarea className="cu-textarea" value={hairProfile.allergies} onChange={(e) => updateHairProfile("allergies", e.target.value)} />
+                    <textarea
+                      className="cu-textarea"
+                      value={hairProfile.allergies}
+                      onChange={(e) => updateHairProfile("allergies", e.target.value)}
+                    />
                   </div>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Persönliche Notizen</label>
-                    <textarea className="cu-textarea" value={hairProfile.notes} onChange={(e) => updateHairProfile("notes", e.target.value)} />
+                    <textarea
+                      className="cu-textarea"
+                      value={hairProfile.notes}
+                      onChange={(e) => updateHairProfile("notes", e.target.value)}
+                    />
                   </div>
                 </div>
               </div>
 
               <div className="cu-save-box">
-                <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    flexWrap: "wrap",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <div>
                     <span className="cu-mini-badge">Profil</span>
                     <p className="cu-muted" style={{ margin: "10px 0 0 0", fontSize: "13px" }}>
@@ -1480,7 +1707,9 @@ export default function CustomerApp({
                   </button>
                 </div>
 
-                {profileSaved ? <div className="cu-save-success">Dein Haarprofil wurde gespeichert.</div> : null}
+                {profileSaved ? (
+                  <div className="cu-save-success">Dein Haarprofil wurde gespeichert.</div>
+                ) : null}
               </div>
             </section>
           )}
@@ -1504,7 +1733,12 @@ export default function CustomerApp({
               <div className="cu-grid">
                 {hairHistory.map((item) => (
                   <div key={item.id} className="cu-card">
-                    <HistoryVisual title={item.title} subtitle={item.date} colorA={item.colorA} colorB={item.colorB} />
+                    <HistoryVisual
+                      title={item.title}
+                      subtitle={item.date}
+                      colorA={item.colorA}
+                      colorB={item.colorB}
+                    />
                     <div className="cu-card-padding">
                       <span className="cu-mini-badge">{item.date}</span>
 
@@ -1586,13 +1820,17 @@ export default function CustomerApp({
 
               <div className="cu-appointment-layout">
                 <div className="cu-card cu-card-padding">
-                  <h3 style={{ marginBottom: 14 }}>1. Hauptleistung</h3>
+                  <h3 style={{ marginBottom: 14, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    1. Hauptleistung
+                  </h3>
 
                   <div className="cu-service-grid">
                     {MAIN_SERVICES.map((service) => (
                       <button
                         key={service.id}
-                        className={`cu-service-btn ${appointmentPrep.selectedMainService === service.id ? "active" : ""}`}
+                        className={`cu-service-btn ${
+                          appointmentPrep.selectedMainService === service.id ? "active" : ""
+                        }`}
                         onClick={() => updateAppointment("selectedMainService", service.id)}
                       >
                         <div className="cu-service-top">
@@ -1604,13 +1842,24 @@ export default function CustomerApp({
                     ))}
                   </div>
 
-                  <h3 style={{ marginTop: 22, marginBottom: 10 }}>2. Extras</h3>
+                  <h3
+                    style={{
+                      marginTop: 22,
+                      marginBottom: 10,
+                      fontSize: 24,
+                      fontFamily: '"Playfair Display", Georgia, serif',
+                    }}
+                  >
+                    2. Extras
+                  </h3>
 
                   <div className="cu-extras">
                     {EXTRA_SERVICES.map((extra) => (
                       <button
                         key={extra.id}
-                        className={`cu-extra-btn ${appointmentPrep.selectedExtras.includes(extra.id) ? "active" : ""}`}
+                        className={`cu-extra-btn ${
+                          appointmentPrep.selectedExtras.includes(extra.id) ? "active" : ""
+                        }`}
                         onClick={() => toggleExtra(extra.id)}
                       >
                         {extra.name}
@@ -1641,9 +1890,11 @@ export default function CustomerApp({
                               onClick={() => updateAppointment("preferredStylist", stylist)}
                               className="cu-extra-btn"
                               style={{
-                                border: active ? "1px solid rgba(212,175,55,0.35)" : "1px solid rgba(255,255,255,0.10)",
+                                border: active
+                                  ? "1px solid rgba(212,175,55,0.35)"
+                                  : "1px solid rgba(255,255,255,0.10)",
                                 background: active
-                                  ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
+                                  ? "linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05))"
                                   : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
                                 color: active ? "#efcf72" : "#fff",
                               }}
@@ -1657,12 +1908,22 @@ export default function CustomerApp({
 
                     <div className="cu-form-group">
                       <label className="cu-label">Wunschdatum</label>
-                      <input className="cu-input" type="date" value={appointmentPrep.preferredDate} onChange={(e) => updateAppointment("preferredDate", e.target.value)} />
+                      <input
+                        className="cu-input"
+                        type="date"
+                        value={appointmentPrep.preferredDate}
+                        onChange={(e) => updateAppointment("preferredDate", e.target.value)}
+                      />
                     </div>
 
                     <div className="cu-form-group">
                       <label className="cu-label">Wunschzeit</label>
-                      <input className="cu-input" type="time" value={appointmentPrep.preferredTime} onChange={(e) => updateAppointment("preferredTime", e.target.value)} />
+                      <input
+                        className="cu-input"
+                        type="time"
+                        value={appointmentPrep.preferredTime}
+                        onChange={(e) => updateAppointment("preferredTime", e.target.value)}
+                      />
                     </div>
 
                     <div className="cu-form-group cu-full-width">
@@ -1681,11 +1942,15 @@ export default function CustomerApp({
 
                 <div className="cu-card cu-card-padding">
                   <span className="cu-mini-badge">Live-Vorschau</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Dein Terminwunsch</h3>
+                  <h3 style={{ marginTop: 12, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Dein Terminwunsch
+                  </h3>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hauptleistung</span>
-                    <p className="cu-summary-text">{selectedMainService?.name || "Nicht gewählt"}</p>
+                    <p className="cu-summary-text">
+                      {selectedMainService?.name || "Nicht gewählt"}
+                    </p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -1703,12 +1968,16 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschlook</span>
-                    <p className="cu-summary-text">{appointmentPrep.desiredLook || "Keine Angabe"}</p>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.desiredLook || "Keine Angabe"}
+                    </p>
                   </div>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschfriseur</span>
-                    <p className="cu-summary-text">{appointmentPrep.preferredStylist || "Egal"}</p>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.preferredStylist || "Egal"}
+                    </p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -1721,7 +1990,9 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hinweise an den Salon</span>
-                    <p className="cu-summary-text">{appointmentPrep.importantNote || "Keine Angabe"}</p>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.importantNote || "Keine Angabe"}
+                    </p>
                   </div>
 
                   <div className="cu-actions">
@@ -1748,7 +2019,9 @@ export default function CustomerApp({
 
               <div className="cu-grid-2">
                 <div className="cu-card cu-card-padding">
-                  <h3 style={{ marginBottom: 16 }}>Neue Bewertung</h3>
+                  <h3 style={{ marginBottom: 16, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Neue Bewertung
+                  </h3>
 
                   <div className="cu-form-group">
                     <label className="cu-label">Sterne</label>
@@ -1771,12 +2044,18 @@ export default function CustomerApp({
                     </button>
                   </div>
 
-                  {reviewSaved ? <div className="cu-save-success">Deine Bewertung wurde gespeichert.</div> : null}
+                  {reviewSaved ? (
+                    <div className="cu-save-success">
+                      Deine Bewertung wurde gespeichert.
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="cu-card cu-card-padding">
                   <span className="cu-mini-badge">Durchschnitt</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>⭐ {averageRating} / 5</h3>
+                  <h3 style={{ marginTop: 12, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    ⭐ {averageRating} / 5
+                  </h3>
                   <p className="cu-muted" style={{ marginTop: 8 }}>
                     Basierend auf den letzten Kundenerfahrungen im Hair Pass Studio.
                   </p>
@@ -1787,7 +2066,9 @@ export default function CustomerApp({
                         <div className="cu-request-top">
                           <div>
                             <strong>{item.customerName}</strong>
-                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>{item.date}</p>
+                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
+                              {item.date}
+                            </p>
                           </div>
                           <span className="cu-request-status">⭐ {item.rating}</span>
                         </div>
@@ -1818,7 +2099,9 @@ export default function CustomerApp({
 
               <div className="cu-grid-2">
                 <div className="cu-card cu-card-padding">
-                  <h3 style={{ marginBottom: 16 }}>Kunde</h3>
+                  <h3 style={{ marginBottom: 16, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Kunde
+                  </h3>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Name</span>
@@ -1842,11 +2125,15 @@ export default function CustomerApp({
                 </div>
 
                 <div className="cu-card cu-card-padding">
-                  <h3 style={{ marginBottom: 16 }}>Terminwunsch</h3>
+                  <h3 style={{ marginBottom: 16, fontSize: 24, fontFamily: '"Playfair Display", Georgia, serif' }}>
+                    Terminwunsch
+                  </h3>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hauptleistung</span>
-                    <p className="cu-summary-text">{selectedMainService?.name || "Nicht gewählt"}</p>
+                    <p className="cu-summary-text">
+                      {selectedMainService?.name || "Nicht gewählt"}
+                    </p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -1864,12 +2151,16 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschlook</span>
-                    <p className="cu-summary-text">{appointmentPrep.desiredLook || "Keine Angabe"}</p>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.desiredLook || "Keine Angabe"}
+                    </p>
                   </div>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Wunschfriseur</span>
-                    <p className="cu-summary-text">{appointmentPrep.preferredStylist || "Egal"}</p>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.preferredStylist || "Egal"}
+                    </p>
                   </div>
 
                   <div className="cu-summary-block">
@@ -1882,7 +2173,9 @@ export default function CustomerApp({
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Hinweise an den Salon</span>
-                    <p className="cu-summary-text">{appointmentPrep.importantNote || "Keine Angabe"}</p>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.importantNote || "Keine Angabe"}
+                    </p>
                   </div>
 
                   <div className="cu-actions">

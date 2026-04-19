@@ -866,19 +866,17 @@ const showPopupMessage = (message, tone = null) => {
   };
 
   const handleUseInspiration = (item) => {
+    unlockAudio();
     setAppointmentPrep((prev) => ({
       ...prev,
       desiredLook: item.title,
     }));
-    setPopup({
-      visible: true,
-      message: `${item.title} wurde als Wunschlook übernommen.`,
-    });
-    setTimeout(() => setPopup({ visible: false, message: "" }), 2200);
+    showPopupMessage(`${item.title} wurde als Wunschlook übernommen.`);
     setActiveTab("appointment");
   };
 
   const handleSubmitRequest = () => {
+    unlockAudio();
     if (!selectedMainService) {
       setSubmitError("Bitte wähle zuerst eine Hauptleistung aus.");
       setActiveTab("appointment");
@@ -901,9 +899,10 @@ const showPopupMessage = (message, tone = null) => {
     });
 
     setLastSubmittedRequest(created || null);
-    setShowSuccessModal(true);
-    setSubmitError("");
-    setActiveTab("dashboard");
+setShowSuccessModal(true);
+setSubmitError("");
+showPopupMessage("Deine Anfrage wurde an den Salon übermittelt.", "default");
+setActiveTab("dashboard");
   };
 
   return (

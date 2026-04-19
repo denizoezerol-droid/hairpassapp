@@ -63,11 +63,39 @@ const DEMO_CUSTOMERS = [
   },
 ];
 
+const INITIAL_REVIEWS = [
+  {
+    id: "review-1",
+    customerName: "Tascha Schmidt",
+    rating: 5,
+    comment: "Sehr ruhige Beratung und hochwertiges Ergebnis.",
+    date: "14.04.2026",
+  },
+  {
+    id: "review-2",
+    customerName: "Deniz Özerol",
+    rating: 4,
+    comment: "Wunschlook wurde gut verstanden und sauber umgesetzt.",
+    date: "02.04.2026",
+  },
+];
+
+const OPENING_HOURS = [
+  { day: "Montag", value: "09:00 – 18:00" },
+  { day: "Dienstag", value: "09:00 – 18:00" },
+  { day: "Mittwoch", value: "09:00 – 18:00" },
+  { day: "Donnerstag", value: "09:00 – 19:00" },
+  { day: "Freitag", value: "09:00 – 18:00" },
+  { day: "Samstag", value: "09:00 – 14:00" },
+  { day: "Sonntag", value: "Geschlossen" },
+];
+
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard" },
   { id: "customers", label: "Kunden" },
   { id: "requests", label: "Anfragen" },
   { id: "history", label: "Verlauf" },
+  { id: "reviews", label: "Bewertungen" },
   { id: "notes", label: "Notizen" },
 ];
 
@@ -121,6 +149,25 @@ function DemoVisual({ title, subtitle, colorA = "#2a2a2a", colorB = "#141414" })
   );
 }
 
+function StarRow({ value }) {
+  return (
+    <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span
+          key={star}
+          style={{
+            color: star <= value ? "#e8cb73" : "rgba(255,255,255,0.20)",
+            fontSize: 20,
+            lineHeight: 1,
+          }}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export default function SalonApp({
   onLogout,
   currentUser,
@@ -132,71 +179,18 @@ export default function SalonApp({
   const [selectedCustomerId, setSelectedCustomerId] = useState(DEMO_CUSTOMERS[0].id);
   const [salonNote, setSalonNote] = useState("");
   const [noteSaved, setNoteSaved] = useState(false);
-  const [popup, setPopup] = useState({ visible: false, message: "" });
+  const [popup, setPopup] = useState({ visible: false, title: "", message: "", tone: "default" });
+  const [reviews] = useState(INITIAL_REVIEWS);
+
   const previousRequestIdsRef = useRef([]);
-const audioUnlockedRef = useRef(false);
-
-const unlockAudio = () => {
-  audioUnlockedRef.current = true;
-};
-
-const playTone = (type = "default") => {
-  try {
-    if (!audioUnlockedRef.current) return;
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-
-    const ctx = new AudioContextClass();
-
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    if (type === "confirmed") {
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(760, ctx.currentTime);
-      oscillator.frequency.linearRampToValueAtTime(920, ctx.currentTime + 0.12);
-      gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-      oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + 0.35);
-    } else {
-      oscillator.type = "triangle";
-      oscillator.frequency.setValueAtTime(640, ctx.currentTime);
-      gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-      oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + 0.22);
-    }
-  } catch (error) {
-    console.error("Ton konnte nicht abgespielt werden:", error);
-  }
-};
-
-const showPopupMessage = (message, tone = null) => {
-  setPopup({ visible: true, message });
-
-  if (tone) {
-    playTone(tone);
-  }
-
-  window.clearTimeout(showPopupMessage.timeoutId);
-  showPopupMessage.timeoutId = window.setTimeout(() => {
-    setPopup({ visible: false, message: "" });
-  }, 2400);
-};
+  const audioUnlockedRef = useRef(false);
 
   useEffect(() => {
-    const existing = document.getElementById("hairpass-salon-premium-v2");
+    const existing = document.getElementById("hairpass-salon-block-a-styles");
     if (existing) return;
 
     const style = document.createElement("style");
-    style.id = "hairpass-salon-premium-v2";
+    style.id = "hairpass-salon-block-a-styles";
     style.innerHTML = `
       * { box-sizing: border-box; }
       html, body, #root {
@@ -238,13 +232,14 @@ const showPopupMessage = (message, tone = null) => {
         min-height: 28px;
         padding: 5px 11px;
         border-radius: 999px;
-        background: rgba(212,175,55,0.11);
-        border: 1px solid rgba(212,175,55,0.16);
+        background: rgba(212,175,55,0.10);
+        border: 1px solid rgba(212,175,55,0.18);
         color: #e4c15d;
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
       }
 
       .sa-title {
@@ -279,16 +274,16 @@ const showPopupMessage = (message, tone = null) => {
         border: none;
         background: linear-gradient(135deg, #d4af37 0%, #e8cb73 100%);
         color: #121212;
-        box-shadow: 0 8px 18px rgba(212,175,55,0.14);
+        box-shadow: 0 8px 18px rgba(212,175,55,0.18);
       }
       .sa-secondary-btn {
-        border: 1px solid rgba(255,255,255,0.09);
-        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
         color: #fff;
       }
       .sa-logout-btn {
         border: 1px solid rgba(255,80,80,0.22);
-        background: linear-gradient(135deg, rgba(110,18,18,0.34), rgba(70,8,8,0.88));
+        background: linear-gradient(135deg, rgba(110,18,18,0.32), rgba(70,8,8,0.88));
         color: #fff;
         box-shadow: 0 8px 18px rgba(80,0,0,0.18);
       }
@@ -304,19 +299,20 @@ const showPopupMessage = (message, tone = null) => {
         padding: 8px 12px;
         border-radius: 14px;
         border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(255,255,255,0.03);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
         color: #fff;
         font-size: 13px;
         font-weight: 650;
         cursor: pointer;
         white-space: nowrap;
+        backdrop-filter: blur(10px);
       }
       .sa-nav-btn.active {
-        background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
+        background: linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.34);
       }
 
-      .sa-grid, .sa-grid-2, .sa-grid-3, .sa-grid-4, .sa-layout {
+      .sa-grid, .sa-grid-2, .sa-grid-3, .sa-grid-4, .sa-layout, .sa-stat-grid {
         display: grid;
         gap: 14px;
       }
@@ -324,14 +320,24 @@ const showPopupMessage = (message, tone = null) => {
       .sa-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .sa-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .sa-layout { grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1.35fr); }
+      .sa-stat-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
       .sa-card {
         min-width: 0;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.07);
+        background: linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+        border: 1px solid rgba(255,255,255,0.08);
         border-radius: 20px;
-        box-shadow: 0 12px 36px rgba(0,0,0,0.18);
-        backdrop-filter: blur(14px);
+        box-shadow: 0 14px 38px rgba(0,0,0,0.22);
+        backdrop-filter: blur(16px);
+        position: relative;
+        overflow: hidden;
+      }
+      .sa-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent 35%);
+        pointer-events: none;
       }
       .sa-card-padding { padding: 14px; }
 
@@ -352,20 +358,16 @@ const showPopupMessage = (message, tone = null) => {
         font-size: 14px;
       }
 
-      .sa-stat-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-      }
       .sa-stat-card {
         text-align: left;
         padding: 16px;
         border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.07);
-        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        background: linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
         color: #fff;
         cursor: pointer;
-        box-shadow: 0 12px 36px rgba(0,0,0,0.18);
+        box-shadow: 0 14px 38px rgba(0,0,0,0.22);
+        backdrop-filter: blur(16px);
       }
       .sa-stat-card.highlight {
         background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(255,255,255,0.05));
@@ -411,13 +413,14 @@ const showPopupMessage = (message, tone = null) => {
         padding: 14px;
         border-radius: 16px;
         border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(255,255,255,0.035);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         cursor: pointer;
+        backdrop-filter: blur(10px);
       }
       .sa-customer-btn.active {
-        background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
-        border-color: rgba(212,175,55,0.35);
+        background: linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05));
+        border-color: rgba(212,175,55,0.34);
       }
 
       .sa-summary-block + .sa-summary-block { margin-top: 14px; }
@@ -461,7 +464,7 @@ const showPopupMessage = (message, tone = null) => {
         padding: 8px 12px;
         border-radius: 999px;
         border: 1px solid rgba(255,255,255,0.10);
-        background: rgba(255,255,255,0.035);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         font-size: 13px;
         font-weight: 700;
@@ -478,12 +481,13 @@ const showPopupMessage = (message, tone = null) => {
         min-height: 112px;
         border-radius: 14px;
         border: 1px solid rgba(255,255,255,0.09);
-        background: rgba(255,255,255,0.04);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         padding: 12px 14px;
         outline: none;
         resize: vertical;
         font-size: 14px;
+        backdrop-filter: blur(10px);
       }
 
       .sa-actions {
@@ -503,18 +507,53 @@ const showPopupMessage = (message, tone = null) => {
         font-weight: 600;
       }
 
+      .sa-hours-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .sa-hours-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+
       .sa-popup {
         position: fixed;
         top: 18px;
         right: 18px;
         z-index: 9999;
-        max-width: 320px;
+        width: min(360px, calc(100vw - 28px));
         padding: 14px 16px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(17,20,27,0.96), rgba(10,12,18,0.98));
-        border: 1px solid rgba(212,175,55,0.22);
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(17,20,27,0.82), rgba(10,12,18,0.90));
+        border: 1px solid rgba(212,175,55,0.24);
         box-shadow: 0 20px 50px rgba(0,0,0,0.34);
         color: #fff;
+        backdrop-filter: blur(18px);
+        animation: saSlideIn 0.28s ease;
+      }
+      .sa-popup-title {
+        font-size: 13px;
+        font-weight: 800;
+        color: #efcf72;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .sa-popup-text {
+        color: rgba(255,255,255,0.88);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+      @keyframes saSlideIn {
+        from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
       }
 
       @media (max-width: 1050px) {
@@ -562,12 +601,65 @@ const showPopupMessage = (message, tone = null) => {
           left: 14px;
           right: 14px;
           top: 14px;
-          max-width: none;
+          width: auto;
         }
       }
     `;
     document.head.appendChild(style);
   }, []);
+
+  const unlockAudio = () => {
+    audioUnlockedRef.current = true;
+  };
+
+  const playTone = (type = "default") => {
+    try {
+      if (!audioUnlockedRef.current) return;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      const ctx = new AudioContextClass();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      if (type === "confirmed") {
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(760, ctx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(920, ctx.currentTime + 0.12);
+        gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.35);
+      } else {
+        oscillator.type = "triangle";
+        oscillator.frequency.setValueAtTime(640, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.22);
+      }
+    } catch (error) {
+      console.error("Ton konnte nicht abgespielt werden:", error);
+    }
+  };
+
+  const showPopupMessage = (title, message, tone = null) => {
+    setPopup({ visible: true, title, message, tone });
+
+    if (tone) {
+      playTone(tone);
+    }
+
+    window.clearTimeout(showPopupMessage.timeoutId);
+    showPopupMessage.timeoutId = window.setTimeout(() => {
+      setPopup({ visible: false, title: "", message: "", tone: "default" });
+    }, 2400);
+  };
 
   const selectedCustomer = useMemo(
     () => customers.find((customer) => customer.id === selectedCustomerId) || customers[0],
@@ -603,9 +695,9 @@ const showPopupMessage = (message, tone = null) => {
   const dailyRevenue = confirmedRequests.length * 95;
   const monthlyRevenue = confirmedRequests.length * 320;
   const averageRating =
-    customers.length > 0
+    reviews.length > 0
       ? (
-          customers.reduce((sum, customer) => sum + (customer.rating || 0), 0) / customers.length
+          reviews.reduce((sum, item) => sum + item.rating, 0) / reviews.length
         ).toFixed(1)
       : "0.0";
 
@@ -614,25 +706,27 @@ const showPopupMessage = (message, tone = null) => {
     .slice(0, 3);
 
   useEffect(() => {
-  const requestIds = (sharedRequests || []).map((item) => item.id);
+    const requestIds = (sharedRequests || []).map((item) => item.id);
 
-  if (previousRequestIdsRef.current.length === 0) {
+    if (previousRequestIdsRef.current.length === 0) {
+      previousRequestIdsRef.current = requestIds;
+      return;
+    }
+
+    const newestRequest = requestsWithCustomer.find(
+      (item) => !previousRequestIdsRef.current.includes(item.id)
+    );
+
+    if (newestRequest) {
+      showPopupMessage("Neue Anfrage", `Neue Anfrage von ${newestRequest.customerName}.`, "default");
+    }
+
     previousRequestIdsRef.current = requestIds;
-    return;
-  }
-
-  const newestRequest = requestsWithCustomer.find(
-    (item) => !previousRequestIdsRef.current.includes(item.id)
-  );
-
-  if (newestRequest) {
-    showPopupMessage(`Neue Anfrage von ${newestRequest.customerName}.`, "default");
-  }
-
-  previousRequestIdsRef.current = requestIds;
-}, [sharedRequests, requestsWithCustomer]);
+  }, [sharedRequests, requestsWithCustomer]);
 
   const saveSalonNote = () => {
+    unlockAudio();
+
     if (!salonNote.trim()) return;
 
     setCustomers((prev) =>
@@ -645,22 +739,31 @@ const showPopupMessage = (message, tone = null) => {
 
     setSalonNote("");
     setNoteSaved(true);
+    showPopupMessage("Notiz gespeichert", "Die interne Salon-Notiz wurde gespeichert.");
     setTimeout(() => setNoteSaved(false), 2200);
   };
 
   const handleUpdateStatus = (requestId, status, customerName, mainService) => {
-  unlockAudio();
+    unlockAudio();
 
-  if (typeof onUpdateRequestStatus === "function") {
-    onUpdateRequestStatus(requestId, status);
-  }
+    if (typeof onUpdateRequestStatus === "function") {
+      onUpdateRequestStatus(requestId, status);
+    }
 
-  if (status === "Bestätigt") {
-    showPopupMessage(`${mainService} für ${customerName} wurde bestätigt.`, "confirmed");
-  } else if (status === "Erledigt") {
-    showPopupMessage(`${mainService} für ${customerName} wurde abgeschlossen.`, "default");
-  }
-};
+    if (status === "Bestätigt") {
+      showPopupMessage(
+        "Termin bestätigt",
+        `${mainService} für ${customerName} wurde bestätigt.`,
+        "confirmed"
+      );
+    } else if (status === "Erledigt") {
+      showPopupMessage(
+        "Termin abgeschlossen",
+        `${mainService} für ${customerName} wurde abgeschlossen.`,
+        "default"
+      );
+    }
+  };
 
   return (
     <>
@@ -677,12 +780,12 @@ const showPopupMessage = (message, tone = null) => {
             </div>
 
             <button
-  className="sa-logout-btn"
-  onClick={() => {
-    unlockAudio();
-    onLogout();
-  }}
->
+              className="sa-logout-btn"
+              onClick={() => {
+                unlockAudio();
+                onLogout();
+              }}
+            >
               Logout
             </button>
           </div>
@@ -693,9 +796,9 @@ const showPopupMessage = (message, tone = null) => {
                 key={item.id}
                 className={`sa-nav-btn ${activeTab === item.id ? "active" : ""}`}
                 onClick={() => {
-  unlockAudio();
-  setActiveTab(item.id);
-}}
+                  unlockAudio();
+                  setActiveTab(item.id);
+                }}
               >
                 {item.label}
               </button>
@@ -726,7 +829,7 @@ const showPopupMessage = (message, tone = null) => {
                 <button className="sa-stat-card" onClick={() => setActiveTab("requests")}>
                   <span className="sa-stat-top">Bestätigt</span>
                   <span className="sa-stat-value">{confirmedRequests.length}</span>
-                  <div className="sa-stat-sub">fertig zugesagt</div>
+                  <div className="sa-stat-sub">bereits zugesagt</div>
                 </button>
               </div>
 
@@ -743,25 +846,40 @@ const showPopupMessage = (message, tone = null) => {
                   <div className="sa-stat-sub">Demo-KPI für Präsentation</div>
                 </div>
 
-                <div className="sa-stat-card highlight">
+                <button className="sa-stat-card highlight" onClick={() => setActiveTab("reviews")}>
                   <span className="sa-stat-top">Bewertung</span>
                   <span className="sa-stat-value">⭐ {averageRating}</span>
                   <div className="sa-stat-sub">durchschnittliche Zufriedenheit</div>
-                </div>
+                </button>
 
                 <div className="sa-stat-card highlight">
-                  <span className="sa-stat-top">Öffnungszeiten</span>
-                  <span className="sa-stat-value" style={{ fontSize: 18, lineHeight: 1.25 }}>
-                    Mo–Fr 09–18
+                  <span className="sa-stat-top">Top Kunde</span>
+                  <span className="sa-stat-value" style={{ fontSize: 20 }}>
+                    {topCustomers[0]?.fullName?.split(" ")[0] || "-"}
                   </span>
-                  <div className="sa-stat-sub">Sa 09–14 · So geschlossen</div>
+                  <div className="sa-stat-sub">
+                    {topCustomers[0] ? `${topCustomers[0].visits} Besuche` : "Noch keine Daten"}
+                  </div>
                 </div>
               </div>
 
-              <div className="sa-layout">
+              <div className="sa-grid-2">
+                <div className="sa-card sa-card-padding">
+                  <span className="sa-mini-badge">Öffnungszeiten</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Hair Pass Studio</h3>
+                  <div className="sa-hours-list">
+                    {OPENING_HOURS.map((item) => (
+                      <div key={item.day} className="sa-hours-row">
+                        <strong style={{ fontSize: 14 }}>{item.day}</strong>
+                        <span style={{ color: "rgba(255,255,255,0.78)", fontSize: 14 }}>{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="sa-card sa-card-padding">
                   <span className="sa-mini-badge">Top Kunden</span>
-                  <h2 className="sa-section-title">Wiederkehrende Stammkunden</h2>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Wiederkehrende Stammkunden</h3>
 
                   <div className="sa-stack" style={{ marginTop: 14 }}>
                     {topCustomers.map((customer) => (
@@ -781,60 +899,60 @@ const showPopupMessage = (message, tone = null) => {
                     ))}
                   </div>
                 </div>
+              </div>
 
-                <div className="sa-grid">
-                  <div className="sa-card sa-card-padding">
-                    <span className="sa-mini-badge">Kunde</span>
-                    <h2 className="sa-section-title">{selectedCustomer.fullName}</h2>
+              <div className="sa-layout">
+                <div className="sa-card sa-card-padding">
+                  <span className="sa-mini-badge">Kunde</span>
+                  <h2 className="sa-section-title">{selectedCustomer.fullName}</h2>
 
-                    <div className="sa-summary-block">
-                      <span className="sa-summary-label">Kontakt</span>
-                      <p className="sa-summary-text">{selectedCustomer.email}</p>
-                      <p className="sa-summary-text">{selectedCustomer.phone}</p>
-                    </div>
-
-                    <div className="sa-summary-block">
-                      <span className="sa-summary-label">Haarprofil</span>
-                      <p className="sa-summary-text">
-                        {selectedCustomer.hairLength}, {selectedCustomer.hairStructure}, {selectedCustomer.currentHairColor}
-                      </p>
-                    </div>
+                  <div className="sa-summary-block">
+                    <span className="sa-summary-label">Kontakt</span>
+                    <p className="sa-summary-text">{selectedCustomer.email}</p>
+                    <p className="sa-summary-text">{selectedCustomer.phone}</p>
                   </div>
 
-                  <div className="sa-card sa-card-padding">
-                    <span className="sa-mini-badge">Aktuellste Anfrage</span>
-                    <h2 className="sa-section-title">Kundenwunsch</h2>
-
-                    {customerRequests[0] ? (
-                      <>
-                        <div className="sa-summary-block">
-                          <span className="sa-summary-label">Behandlung</span>
-                          <p className="sa-summary-text">{customerRequests[0].mainService}</p>
-                        </div>
-
-                        <div className="sa-summary-block">
-                          <span className="sa-summary-label">Wunschlook</span>
-                          <p className="sa-summary-text">{customerRequests[0].desiredLook}</p>
-                        </div>
-
-                        <div className="sa-summary-block">
-                          <span className="sa-summary-label">Wunschfriseur</span>
-                          <p className="sa-summary-text">
-                            {customerRequests[0].preferredStylist || "Egal"}
-                          </p>
-                        </div>
-
-                        <div className="sa-summary-block">
-                          <span className="sa-summary-label">Termin</span>
-                          <p className="sa-summary-text">
-                            {customerRequests[0].preferredDate} um {customerRequests[0].preferredTime}
-                          </p>
-                        </div>
-                      </>
-                    ) : (
-                      <p className="sa-muted" style={{ marginTop: 14 }}>Keine Anfragen vorhanden.</p>
-                    )}
+                  <div className="sa-summary-block">
+                    <span className="sa-summary-label">Haarprofil</span>
+                    <p className="sa-summary-text">
+                      {selectedCustomer.hairLength}, {selectedCustomer.hairStructure}, {selectedCustomer.currentHairColor}
+                    </p>
                   </div>
+                </div>
+
+                <div className="sa-card sa-card-padding">
+                  <span className="sa-mini-badge">Aktuellste Anfrage</span>
+                  <h2 className="sa-section-title">Kundenwunsch</h2>
+
+                  {customerRequests[0] ? (
+                    <>
+                      <div className="sa-summary-block">
+                        <span className="sa-summary-label">Behandlung</span>
+                        <p className="sa-summary-text">{customerRequests[0].mainService}</p>
+                      </div>
+
+                      <div className="sa-summary-block">
+                        <span className="sa-summary-label">Wunschlook</span>
+                        <p className="sa-summary-text">{customerRequests[0].desiredLook}</p>
+                      </div>
+
+                      <div className="sa-summary-block">
+                        <span className="sa-summary-label">Wunschfriseur</span>
+                        <p className="sa-summary-text">
+                          {customerRequests[0].preferredStylist || "Egal"}
+                        </p>
+                      </div>
+
+                      <div className="sa-summary-block">
+                        <span className="sa-summary-label">Termin</span>
+                        <p className="sa-summary-text">
+                          {customerRequests[0].preferredDate} um {customerRequests[0].preferredTime}
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="sa-muted" style={{ marginTop: 14 }}>Keine Anfragen vorhanden.</p>
+                  )}
                 </div>
               </div>
             </section>
@@ -1042,6 +1160,51 @@ const showPopupMessage = (message, tone = null) => {
             </section>
           )}
 
+          {activeTab === "reviews" && (
+            <section className="sa-grid">
+              <div className="sa-section-head">
+                <div>
+                  <span className="sa-mini-badge">Bewertungen</span>
+                  <h2 className="sa-section-title">Kundenfeedback im Überblick</h2>
+                  <p className="sa-muted">
+                    Letzte Sternebewertungen und Kommentare aus Kundensicht.
+                  </p>
+                </div>
+              </div>
+
+              <div className="sa-grid-2">
+                <div className="sa-card sa-card-padding">
+                  <span className="sa-mini-badge">Durchschnitt</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>⭐ {averageRating} / 5</h3>
+                  <p className="sa-muted" style={{ marginTop: 8 }}>
+                    Sichtbarer Qualitätsindikator für den Salonbetrieb.
+                  </p>
+
+                  <div className="sa-summary-block">
+                    <span className="sa-summary-label">Gesamtanzahl</span>
+                    <p className="sa-summary-text">{reviews.length} Bewertungen</p>
+                  </div>
+                </div>
+
+                <div className="sa-card sa-card-padding">
+                  <span className="sa-mini-badge">Letzte Einträge</span>
+                  <div className="sa-grid" style={{ marginTop: 14 }}>
+                    {reviews.map((item) => (
+                      <div key={item.id} className="sa-card" style={{ padding: 14 }}>
+                        <strong>{item.customerName}</strong>
+                        <p className="sa-muted" style={{ margin: "6px 0 10px 0" }}>{item.date}</p>
+                        <StarRow value={item.rating} />
+                        <p className="sa-summary-text" style={{ marginTop: 12 }}>
+                          {item.comment}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           {activeTab === "notes" && (
             <section className="sa-grid">
               <div className="sa-section-head">
@@ -1093,8 +1256,8 @@ const showPopupMessage = (message, tone = null) => {
 
       {popup.visible ? (
         <div className="sa-popup">
-          <strong style={{ display: "block", marginBottom: 4 }}>Hair Pass Salon</strong>
-          <span style={{ color: "rgba(255,255,255,0.86)", fontSize: 14 }}>{popup.message}</span>
+          <div className="sa-popup-title">{popup.title}</div>
+          <div className="sa-popup-text">{popup.message}</div>
         </div>
       ) : null}
     </>

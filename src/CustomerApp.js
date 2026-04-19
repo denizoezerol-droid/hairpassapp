@@ -63,18 +63,23 @@ const INITIAL_INSPIRATIONS = [
     id: "inspo-1",
     title: "Soft Glow Bob",
     subtitle: "Natürlicher, eleganter Look",
-    category: "Bob · Soft Finish",
-    colorA: "#4f3516",
-    colorB: "#111111",
+    category: "Bob",
+    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e"
   },
   {
     id: "inspo-2",
     title: "Warme Balayage",
-    subtitle: "Weicher, luxuriöser Verlauf",
-    category: "Color · Luxury Blend",
-    colorA: "#6a4923",
-    colorB: "#161616",
+    subtitle: "Luxuriöser Farbverlauf",
+    category: "Color",
+    image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1"
   },
+  {
+    id: "inspo-3",
+    title: "Hochsteckfrisur Elegant",
+    subtitle: "Perfekt für Events",
+    category: "Updo",
+    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
+  }
 ];
 
 const INITIAL_REVIEWS = [
@@ -104,51 +109,59 @@ const NAV_ITEMS = [
   { id: "summary", label: "Final" },
 ];
 
-function InspirationVisual({ title, subtitle, category, colorA, colorB }) {
+function InspirationVisual({ title, subtitle, category, image }) {
   return (
     <div
       style={{
         minHeight: 260,
-        position: "relative",
-        overflow: "hidden",
         borderRadius: "20px 20px 0 0",
-        background: `linear-gradient(135deg, ${colorA}, ${colorB})`,
+        overflow: "hidden",
+        position: "relative",
+        background: "#111",
       }}
     >
+      {/* BILD */}
+      {image ? (
+        <img
+          src={image}
+          alt={title}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover"
+          }}
+        />
+      ) : (
+        <div style={{
+          width: "100%",
+          height: "100%",
+          background: "linear-gradient(135deg,#333,#111)"
+        }} />
+      )}
+
+      {/* OVERLAY */}
       <div
         style={{
           position: "absolute",
           inset: 0,
           background:
-            "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 20%), radial-gradient(circle at 80% 15%, rgba(212,175,55,0.10), transparent 18%), linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.35))",
+            "linear-gradient(180deg, rgba(0,0,0,0.1), rgba(0,0,0,0.6))",
         }}
       />
+
+      {/* TEXT */}
       <div
         style={{
           position: "absolute",
-          left: 18,
-          right: 18,
-          bottom: 18,
+          bottom: "14px",
+          left: "14px",
+          right: "14px",
         }}
       >
-        <div
-          style={{
-            display: "inline-flex",
-            minHeight: 34,
-            alignItems: "center",
-            padding: "7px 12px",
-            borderRadius: 999,
-            background: "rgba(0,0,0,0.26)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            fontWeight: 800,
-            fontSize: 12,
-          }}
-        >
-          {category}
-        </div>
+        <div className="cu-mini-badge">{category}</div>
 
-        <h3 style={{ margin: "12px 0 6px", fontSize: 20 }}>{title}</h3>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.86)" }}>
+        <h3 style={{ margin: "8px 0 4px" }}>{title}</h3>
+        <p style={{ margin: 0, fontSize: "13px", opacity: 0.9 }}>
           {subtitle}
         </p>
       </div>

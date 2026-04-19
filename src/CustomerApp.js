@@ -1142,6 +1142,83 @@ export default function CustomerApp({
           </div>
 
           {activeTab === "dashboard" && (
+            <section className="cu-grid">
+
+            <div className="cu-card cu-card-padding">
+  <span className="cu-mini-badge">Mein Salon</span>
+
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 14,
+      marginTop: 14,
+      flexWrap: "wrap",
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+      <div
+        style={{
+          width: 58,
+          height: 58,
+          borderRadius: 16,
+          background: "linear-gradient(135deg, #d4af37, #e8cb73)",
+          color: "#121212",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 800,
+          fontSize: 18,
+          boxShadow: "0 10px 20px rgba(212,175,55,0.18)",
+        }}
+      >
+        {SALON_PROFILE.logoText}
+      </div>
+
+      <div>
+        <h3 style={{ margin: 0, fontSize: 18 }}>{SALON_PROFILE.name}</h3>
+        <p
+          style={{
+            margin: "4px 0",
+            color: "rgba(255,255,255,0.72)",
+            fontSize: 14,
+          }}
+        >
+          {SALON_PROFILE.subtitle}
+        </p>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            fontSize: 13,
+            color: "#9ff0b8",
+            fontWeight: 700,
+          }}
+        >
+          <span>●</span>
+          <span>{SALON_PROFILE.status}</span>
+        </div>
+
+        <p
+          style={{
+            margin: "6px 0 0 0",
+            color: "rgba(255,255,255,0.66)",
+            fontSize: 13,
+          }}
+        >
+          {SALON_PROFILE.openingShort}
+        </p>
+      </div>
+    </div>
+
+    <button className="cu-secondary-btn">
+      Salon ansehen
+    </button>
+  </div>
+</div>
             <div className="cu-card cu-card-padding" style={{ marginBottom: "14px" }}>
   <span className="cu-mini-badge">Mein Salon</span>
 

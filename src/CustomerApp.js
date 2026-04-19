@@ -35,6 +35,15 @@ const OPENING_HOURS = [
   { day: "Sonntag", value: "Geschlossen" },
 ];
 
+const SALON_PROFILE = {
+  name: "Hair Pass Studio",
+  subtitle: "Luxury Hair & Color",
+  logoText: "HP",
+  status: "Live",
+  openingShort: "Mo–Fr 09:00–18:00",
+  address: "Premium Salon Partner",
+};
+
 const INITIAL_HISTORY = [
   {
     id: "history-1",

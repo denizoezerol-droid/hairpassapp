@@ -861,6 +861,7 @@ export default function CustomerApp({
         }
       }
     `;
+   
     document.head.appendChild(style);
   }, []);
 

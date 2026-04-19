@@ -431,14 +431,14 @@ export default function CustomerApp({
       }
 
       .cu-brand-title {
-        margin: 12px 0 6px;
-        font-family: "Playfair Display", Georgia, serif;
-        font-size: clamp(36px, 5vw, 62px);
-        line-height: 0.95;
-        letter-spacing: -0.045em;
-        color: #fff;
-        text-shadow: 0 0 30px rgba(255,255,255,0.04);
-      }
+  margin: 12px 0 6px;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(28px, 4vw, 46px);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: #fff;
+  text-shadow: 0 0 24px rgba(255,255,255,0.03);
+}
 
       .cu-subtitle {
         margin: 0;
@@ -574,14 +574,14 @@ export default function CustomerApp({
       .cu-hero h2, .cu-section-title, .cu-card h3 { margin: 0; }
 
       .cu-hero h2 {
-        margin-top: 12px;
-        font-size: clamp(30px, 4.2vw, 54px);
-        line-height: 0.98;
-        letter-spacing: -0.05em;
-        font-family: "Playfair Display", Georgia, serif;
-        color: #ffffff;
-        text-shadow: 0 0 28px rgba(255,255,255,0.04);
-      }
+  margin-top: 12px;
+  font-size: clamp(24px, 3.4vw, 40px);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  font-family: "Playfair Display", Georgia, serif;
+  color: #ffffff;
+  text-shadow: 0 0 18px rgba(255,255,255,0.03);
+}
 
       .cu-section-title {
         margin-top: 8px;
@@ -1328,7 +1328,7 @@ export default function CustomerApp({
           <div className="cu-topbar">
             <div>
               <span className="cu-brand-badge">Hair Pass · Kunde</span>
-              <h1 className="cu-brand-title">KUNDENBEREICH TEST 989</h1>
+              <h1 className="cu-brand-title">Kundenbereich</h1>
               <p className="cu-subtitle">
                 Verwalte deinen digitalen Haarpass, deine Wunschlooks und bereite
                 deinen nächsten Termin in einer luxuriösen, klaren Übersicht vor.

@@ -1091,6 +1091,61 @@ export default function CustomerApp({
           </div>
 
           {activeTab === "dashboard" && (
+            <div className="cu-card cu-card-padding" style={{ marginBottom: "14px" }}>
+  <span className="cu-mini-badge">Mein Salon</span>
+
+  <div style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    marginTop: "12px"
+  }}>
+    {/* LOGO */}
+    <div style={{
+      width: "54px",
+      height: "54px",
+      borderRadius: "14px",
+      background: "linear-gradient(135deg, #d4af37, #e8cb73)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontWeight: "800",
+      color: "#111"
+    }}>
+      HP
+    </div>
+
+    {/* INFOS */}
+    <div style={{ flex: 1 }}>
+      <h3 style={{ margin: 0, fontSize: "16px" }}>
+        Hair Pass Studio
+      </h3>
+
+      <p style={{
+        margin: "4px 0",
+        fontSize: "13px",
+        color: "rgba(255,255,255,0.7)"
+      }}>
+        Luxury Hair & Color
+      </p>
+
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "6px",
+        fontSize: "12px",
+        color: "#9ff0b8"
+      }}>
+        ● Live
+      </div>
+    </div>
+
+    {/* BUTTON */}
+    <button className="cu-secondary-btn">
+      Ansehen
+    </button>
+  </div>
+</div>
             <section className="cu-grid">
               <div className="cu-card cu-hero">
                 <div className="cu-hero-head">

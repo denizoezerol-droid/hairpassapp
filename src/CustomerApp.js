@@ -13,7 +13,7 @@ const EXTRA_SERVICES = [
   { id: "massage", name: "Kopfmassage" },
   { id: "eyebrows", name: "Augenbrauen" },
   { id: "gloss", name: "Glossing" },
-  { id: "premium", name: "Hochsteckfrisur" },
+  { id: "updo", name: "Hochsteckfrisuren" },
 ];
 
 const STYLIST_OPTIONS = [
@@ -23,6 +23,16 @@ const STYLIST_OPTIONS = [
   "Julia",
   "Barber Specialist",
   "Color Specialist",
+];
+
+const OPENING_HOURS = [
+  { day: "Montag", value: "09:00 – 18:00" },
+  { day: "Dienstag", value: "09:00 – 18:00" },
+  { day: "Mittwoch", value: "09:00 – 18:00" },
+  { day: "Donnerstag", value: "09:00 – 19:00" },
+  { day: "Freitag", value: "09:00 – 18:00" },
+  { day: "Samstag", value: "09:00 – 14:00" },
+  { day: "Sonntag", value: "Geschlossen" },
 ];
 
 const INITIAL_HISTORY = [
@@ -67,12 +77,30 @@ const INITIAL_INSPIRATIONS = [
   },
 ];
 
+const INITIAL_REVIEWS = [
+  {
+    id: "review-1",
+    customerName: "Tascha Schmidt",
+    rating: 5,
+    comment: "Sehr saubere Beratung und ruhiger Ablauf im Salon.",
+    date: "14.04.2026",
+  },
+  {
+    id: "review-2",
+    customerName: "Deniz Özerol",
+    rating: 4,
+    comment: "Look wurde sehr gut verstanden und professionell umgesetzt.",
+    date: "02.04.2026",
+  },
+];
+
 const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard" },
   { id: "profile", label: "Haarprofil" },
   { id: "history", label: "Verlauf" },
   { id: "inspiration", label: "Inspiration" },
   { id: "appointment", label: "Termin" },
+  { id: "reviews", label: "Bewertung" },
   { id: "summary", label: "Final" },
 ];
 
@@ -178,6 +206,31 @@ function HistoryVisual({ title, subtitle, colorA = "#2a2a2a", colorB = "#141414"
   );
 }
 
+function StarRow({ value, onChange, readOnly = false }) {
+  return (
+    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => !readOnly && onChange?.(star)}
+          style={{
+            border: "none",
+            background: "transparent",
+            color: star <= value ? "#e8cb73" : "rgba(255,255,255,0.24)",
+            fontSize: 26,
+            cursor: readOnly ? "default" : "pointer",
+            padding: 0,
+            lineHeight: 1,
+          }}
+        >
+          ★
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function CustomerApp({
   onLogout,
   currentUser,
@@ -190,64 +243,14 @@ export default function CustomerApp({
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [lastSubmittedRequest, setLastSubmittedRequest] = useState(null);
   const [submitError, setSubmitError] = useState("");
-  const [popup, setPopup] = useState({ visible: false, message: "" });
+  const [popup, setPopup] = useState({ visible: false, title: "", message: "", tone: "default" });
+  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState("");
+  const [reviewSaved, setReviewSaved] = useState(false);
+
   const previousConfirmedIdsRef = useRef([]);
-const audioUnlockedRef = useRef(false);
-
-const unlockAudio = () => {
-  audioUnlockedRef.current = true;
-};
-
-const playTone = (type = "default") => {
-  try {
-    if (!audioUnlockedRef.current) return;
-
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-
-    const ctx = new AudioContextClass();
-
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    if (type === "confirmed") {
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(740, ctx.currentTime);
-      oscillator.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.12);
-      gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-      oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + 0.35);
-    } else {
-      oscillator.type = "triangle";
-      oscillator.frequency.setValueAtTime(620, ctx.currentTime);
-      gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.02);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-      oscillator.start(ctx.currentTime);
-      oscillator.stop(ctx.currentTime + 0.22);
-    }
-  } catch (error) {
-    console.error("Ton konnte nicht abgespielt werden:", error);
-  }
-};
-
-const showPopupMessage = (message, tone = null) => {
-  setPopup({ visible: true, message });
-
-  if (tone) {
-    playTone(tone);
-  }
-
-  window.clearTimeout(showPopupMessage.timeoutId);
-  showPopupMessage.timeoutId = window.setTimeout(() => {
-    setPopup({ visible: false, message: "" });
-  }, 2600);
-};
+  const audioUnlockedRef = useRef(false);
 
   const [customer, setCustomer] = useState({
     firstName: currentUser?.firstName || "Deniz",
@@ -290,11 +293,11 @@ const showPopupMessage = (message, tone = null) => {
   }, [currentUser]);
 
   useEffect(() => {
-    const existing = document.getElementById("hairpass-customer-premium-v2");
+    const existing = document.getElementById("hairpass-customer-block-a-styles");
     if (existing) return;
 
     const style = document.createElement("style");
-    style.id = "hairpass-customer-premium-v2";
+    style.id = "hairpass-customer-block-a-styles";
     style.innerHTML = `
       * { box-sizing: border-box; }
       html, body, #root {
@@ -335,13 +338,14 @@ const showPopupMessage = (message, tone = null) => {
         min-height: 28px;
         padding: 5px 11px;
         border-radius: 999px;
-        background: rgba(212,175,55,0.11);
-        border: 1px solid rgba(212,175,55,0.16);
+        background: rgba(212,175,55,0.10);
+        border: 1px solid rgba(212,175,55,0.18);
         color: #e4c15d;
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
       }
       .cu-title {
         margin: 10px 0 6px;
@@ -375,16 +379,16 @@ const showPopupMessage = (message, tone = null) => {
         border: none;
         background: linear-gradient(135deg, #d4af37 0%, #e8cb73 100%);
         color: #121212;
-        box-shadow: 0 8px 18px rgba(212,175,55,0.14);
+        box-shadow: 0 8px 18px rgba(212,175,55,0.18);
       }
       .cu-secondary-btn {
-        border: 1px solid rgba(255,255,255,0.09);
-        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
         color: #fff;
       }
       .cu-logout-btn {
         border: 1px solid rgba(255,80,80,0.22);
-        background: linear-gradient(135deg, rgba(110,18,18,0.34), rgba(70,8,8,0.88));
+        background: linear-gradient(135deg, rgba(110,18,18,0.32), rgba(70,8,8,0.88));
         color: #fff;
         box-shadow: 0 8px 18px rgba(80,0,0,0.18);
       }
@@ -400,16 +404,18 @@ const showPopupMessage = (message, tone = null) => {
         padding: 8px 12px;
         border-radius: 14px;
         border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(255,255,255,0.03);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
         color: #fff;
         font-size: 13px;
         font-weight: 650;
         cursor: pointer;
         white-space: nowrap;
+        backdrop-filter: blur(10px);
       }
       .cu-nav-btn.active {
-        background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
+        background: linear-gradient(135deg, rgba(212,175,55,0.17), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.34);
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.03);
       }
 
       .cu-grid, .cu-grid-2, .cu-grid-3, .cu-grid-4, .cu-card-grid, .cu-appointment-layout, .cu-service-grid, .cu-form-grid {
@@ -426,11 +432,20 @@ const showPopupMessage = (message, tone = null) => {
 
       .cu-card {
         min-width: 0;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.07);
+        background: linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025));
+        border: 1px solid rgba(255,255,255,0.08);
         border-radius: 20px;
-        box-shadow: 0 12px 36px rgba(0,0,0,0.18);
-        backdrop-filter: blur(14px);
+        box-shadow: 0 14px 38px rgba(0,0,0,0.22);
+        backdrop-filter: blur(16px);
+        position: relative;
+        overflow: hidden;
+      }
+      .cu-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent 35%);
+        pointer-events: none;
       }
       .cu-card-padding { padding: 14px; }
       .cu-hero { padding: 16px; }
@@ -476,9 +491,7 @@ const showPopupMessage = (message, tone = null) => {
         flex-direction: column;
         gap: 7px;
       }
-      .cu-form-group + .cu-form-group {
-        margin-top: 14px;
-      }
+      .cu-form-group + .cu-form-group { margin-top: 14px; }
       .cu-label {
         font-size: 13px;
         color: rgba(255,255,255,0.78);
@@ -489,11 +502,12 @@ const showPopupMessage = (message, tone = null) => {
         min-height: 46px;
         border-radius: 14px;
         border: 1px solid rgba(255,255,255,0.09);
-        background: rgba(255,255,255,0.04);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         padding: 12px 14px;
         outline: none;
         font-size: 14px;
+        backdrop-filter: blur(10px);
       }
       .cu-textarea {
         min-height: 104px;
@@ -507,9 +521,10 @@ const showPopupMessage = (message, tone = null) => {
         padding: 14px;
         border-radius: 16px;
         border: 1px solid rgba(255,255,255,0.08);
-        background: rgba(255,255,255,0.035);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         cursor: pointer;
+        backdrop-filter: blur(10px);
       }
       .cu-service-btn.active {
         background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
@@ -552,11 +567,12 @@ const showPopupMessage = (message, tone = null) => {
         padding: 8px 12px;
         border-radius: 999px;
         border: 1px solid rgba(255,255,255,0.10);
-        background: rgba(255,255,255,0.035);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         color: #fff;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
+        backdrop-filter: blur(10px);
       }
       .cu-extra-btn.active {
         background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
@@ -608,8 +624,9 @@ const showPopupMessage = (message, tone = null) => {
       .cu-request-item {
         padding: 14px;
         border-radius: 16px;
-        background: rgba(255,255,255,0.035);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         border: 1px solid rgba(255,255,255,0.07);
+        backdrop-filter: blur(12px);
       }
       .cu-request-top {
         display: flex;
@@ -634,8 +651,9 @@ const showPopupMessage = (message, tone = null) => {
       .cu-save-box {
         padding: 14px;
         border-radius: 16px;
-        background: rgba(255,255,255,0.035);
+        background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
         border: 1px solid rgba(255,255,255,0.07);
+        backdrop-filter: blur(12px);
       }
       .cu-save-success {
         margin-top: 12px;
@@ -657,18 +675,53 @@ const showPopupMessage = (message, tone = null) => {
         font-size: 13px;
       }
 
+      .cu-hours-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .cu-hours-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+
       .cu-popup {
         position: fixed;
         top: 18px;
         right: 18px;
         z-index: 9999;
-        max-width: 320px;
+        width: min(360px, calc(100vw - 28px));
         padding: 14px 16px;
-        border-radius: 16px;
-        background: linear-gradient(135deg, rgba(17,20,27,0.96), rgba(10,12,18,0.98));
-        border: 1px solid rgba(212,175,55,0.22);
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(17,20,27,0.82), rgba(10,12,18,0.90));
+        border: 1px solid rgba(212,175,55,0.24);
         box-shadow: 0 20px 50px rgba(0,0,0,0.34);
         color: #fff;
+        backdrop-filter: blur(18px);
+        animation: cuSlideIn 0.28s ease;
+      }
+      .cu-popup-title {
+        font-size: 13px;
+        font-weight: 800;
+        color: #efcf72;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .cu-popup-text {
+        color: rgba(255,255,255,0.88);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+      @keyframes cuSlideIn {
+        from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
       }
 
       .cu-modal-backdrop {
@@ -687,9 +740,10 @@ const showPopupMessage = (message, tone = null) => {
         max-width: 500px;
         padding: 18px;
         border-radius: 22px;
-        background: linear-gradient(135deg, rgba(17,20,27,0.96), rgba(10,12,18,0.98));
+        background: linear-gradient(135deg, rgba(17,20,27,0.92), rgba(10,12,18,0.98));
         border: 1px solid rgba(255,255,255,0.10);
         box-shadow: 0 24px 70px rgba(0,0,0,0.36);
+        backdrop-filter: blur(18px);
       }
       .cu-modal h3 {
         margin: 10px 0 10px;
@@ -759,34 +813,88 @@ const showPopupMessage = (message, tone = null) => {
           left: 14px;
           right: 14px;
           top: 14px;
-          max-width: none;
+          width: auto;
         }
       }
     `;
     document.head.appendChild(style);
   }, []);
 
+  const unlockAudio = () => {
+    audioUnlockedRef.current = true;
+  };
+
+  const playTone = (type = "default") => {
+    try {
+      if (!audioUnlockedRef.current) return;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+
+      const ctx = new AudioContextClass();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+
+      if (type === "confirmed") {
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(740, ctx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(880, ctx.currentTime + 0.12);
+        gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.35);
+      } else {
+        oscillator.type = "triangle";
+        oscillator.frequency.setValueAtTime(620, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+        oscillator.start(ctx.currentTime);
+        oscillator.stop(ctx.currentTime + 0.22);
+      }
+    } catch (error) {
+      console.error("Ton konnte nicht abgespielt werden:", error);
+    }
+  };
+
+  const showPopupMessage = (title, message, tone = null) => {
+    setPopup({ visible: true, title, message, tone });
+
+    if (tone) {
+      playTone(tone);
+    }
+
+    window.clearTimeout(showPopupMessage.timeoutId);
+    showPopupMessage.timeoutId = window.setTimeout(() => {
+      setPopup({ visible: false, title: "", message: "", tone: "default" });
+    }, 2600);
+  };
+
   useEffect(() => {
-  const confirmedIds = (confirmedRequests || []).map((item) => item.id);
+    const confirmedIds = (confirmedRequests || []).map((item) => item.id);
 
-  if (previousConfirmedIdsRef.current.length === 0) {
-    previousConfirmedIdsRef.current = confirmedIds;
-    return;
-  }
+    if (previousConfirmedIdsRef.current.length === 0) {
+      previousConfirmedIdsRef.current = confirmedIds;
+      return;
+    }
 
-  const newlyConfirmed = (confirmedRequests || []).find(
-    (item) => !previousConfirmedIdsRef.current.includes(item.id)
-  );
-
-  if (newlyConfirmed) {
-    showPopupMessage(
-      `Dein Termin für ${newlyConfirmed.mainService} wurde bestätigt.`,
-      "confirmed"
+    const newlyConfirmed = (confirmedRequests || []).find(
+      (item) => !previousConfirmedIdsRef.current.includes(item.id)
     );
-  }
 
-  previousConfirmedIdsRef.current = confirmedIds;
-}, [confirmedRequests]);
+    if (newlyConfirmed) {
+      showPopupMessage(
+        "Termin bestätigt",
+        `Dein Termin für ${newlyConfirmed.mainService} wurde bestätigt.`,
+        "confirmed"
+      );
+    }
+
+    previousConfirmedIdsRef.current = confirmedIds;
+  }, [confirmedRequests]); // eslint-disable-line
 
   const selectedMainService = useMemo(
     () =>
@@ -805,6 +913,12 @@ const showPopupMessage = (message, tone = null) => {
   );
 
   const latestRequest = sharedRequests?.[0] || null;
+
+  const averageRating = useMemo(() => {
+    if (!reviews.length) return "0.0";
+    const total = reviews.reduce((sum, item) => sum + item.rating, 0);
+    return (total / reviews.length).toFixed(1);
+  }, [reviews]);
 
   const updateCustomer = (field, value) => {
     setCustomer((prev) => ({ ...prev, [field]: value }));
@@ -861,7 +975,9 @@ const showPopupMessage = (message, tone = null) => {
   };
 
   const handleSaveProfile = () => {
+    unlockAudio();
     setProfileSaved(true);
+    showPopupMessage("Profil gespeichert", "Dein Haarprofil wurde aktualisiert.");
     setTimeout(() => setProfileSaved(false), 2200);
   };
 
@@ -871,12 +987,37 @@ const showPopupMessage = (message, tone = null) => {
       ...prev,
       desiredLook: item.title,
     }));
-    showPopupMessage(`${item.title} wurde als Wunschlook übernommen.`);
+    showPopupMessage("Wunschlook übernommen", `${item.title} wurde übernommen.`);
     setActiveTab("appointment");
+  };
+
+  const handleSubmitReview = () => {
+    unlockAudio();
+
+    if (!newComment.trim()) {
+      showPopupMessage("Bewertung fehlt", "Bitte schreibe kurz, wie dein Termin war.");
+      return;
+    }
+
+    const newEntry = {
+      id: `review-${Date.now()}`,
+      customerName: `${customer.firstName} ${customer.lastName}`,
+      rating: newRating,
+      comment: newComment.trim(),
+      date: new Date().toLocaleDateString("de-DE"),
+    };
+
+    setReviews((prev) => [newEntry, ...prev]);
+    setNewComment("");
+    setNewRating(5);
+    setReviewSaved(true);
+    showPopupMessage("Bewertung gespeichert", "Danke für dein Feedback zum Salon.", "default");
+    setTimeout(() => setReviewSaved(false), 2200);
   };
 
   const handleSubmitRequest = () => {
     unlockAudio();
+
     if (!selectedMainService) {
       setSubmitError("Bitte wähle zuerst eine Hauptleistung aus.");
       setActiveTab("appointment");
@@ -899,10 +1040,14 @@ const showPopupMessage = (message, tone = null) => {
     });
 
     setLastSubmittedRequest(created || null);
-setShowSuccessModal(true);
-setSubmitError("");
-showPopupMessage("Deine Anfrage wurde an den Salon übermittelt.", "default");
-setActiveTab("dashboard");
+    setShowSuccessModal(true);
+    setSubmitError("");
+    showPopupMessage(
+      "Anfrage übermittelt",
+      "Deine Anfrage wurde an den Salon übermittelt.",
+      "default"
+    );
+    setActiveTab("dashboard");
   };
 
   return (
@@ -920,12 +1065,12 @@ setActiveTab("dashboard");
             </div>
 
             <button
-  className="cu-logout-btn"
-  onClick={() => {
-    unlockAudio();
-    onLogout();
-  }}
->
+              className="cu-logout-btn"
+              onClick={() => {
+                unlockAudio();
+                onLogout();
+              }}
+            >
               Logout
             </button>
           </div>
@@ -936,9 +1081,9 @@ setActiveTab("dashboard");
                 key={item.id}
                 className={`cu-nav-btn ${activeTab === item.id ? "active" : ""}`}
                 onClick={() => {
-  unlockAudio();
-  setActiveTab(item.id);
-}}
+                  unlockAudio();
+                  setActiveTab(item.id);
+                }}
               >
                 {item.label}
               </button>
@@ -958,7 +1103,13 @@ setActiveTab("dashboard");
                     </p>
                   </div>
 
-                  <button className="cu-primary-btn" onClick={() => setActiveTab("appointment")}>
+                  <button
+                    className="cu-primary-btn"
+                    onClick={() => {
+                      unlockAudio();
+                      setActiveTab("appointment");
+                    }}
+                  >
                     Termin starten
                   </button>
                 </div>
@@ -993,43 +1144,23 @@ setActiveTab("dashboard");
                 </div>
 
                 <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Inspirationen</span>
-                  <span className="cu-stat-value">{inspirations.length}</span>
+                  <span className="cu-mini-badge">Bewertung</span>
+                  <span className="cu-stat-value">⭐ {averageRating}</span>
                 </div>
               </div>
 
               <div className="cu-grid-2">
                 <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Bestätigte Termine</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Vom Salon bestätigt</h3>
-
-                  {!confirmedRequests || confirmedRequests.length === 0 ? (
-                    <p className="cu-muted" style={{ marginBottom: 0 }}>
-                      Noch keine bestätigten Termine.
-                    </p>
-                  ) : (
-                    <div className="cu-request-list" style={{ marginTop: 14 }}>
-                      {confirmedRequests.map((request) => (
-                        <div key={request.id} className="cu-request-item">
-                          <div className="cu-request-top">
-                            <div>
-                              <strong>{request.mainService}</strong>
-                              <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
-                                {request.preferredDate}
-                                {request.preferredTime ? ` um ${request.preferredTime}` : ""}
-                              </p>
-                            </div>
-                            <span className="cu-request-status">{request.status}</span>
-                          </div>
-
-                          <div className="cu-summary-block">
-                            <span className="cu-summary-label">Wunschfriseur</span>
-                            <p className="cu-summary-text">{request.preferredStylist || "Egal"}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <span className="cu-mini-badge">Öffnungszeiten</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Hair Pass Studio</h3>
+                  <div className="cu-hours-list">
+                    {OPENING_HOURS.map((item) => (
+                      <div key={item.day} className="cu-hours-row">
+                        <strong style={{ fontSize: 14 }}>{item.day}</strong>
+                        <span style={{ color: "rgba(255,255,255,0.78)", fontSize: 14 }}>{item.value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="cu-card cu-card-padding">
@@ -1071,36 +1202,34 @@ setActiveTab("dashboard");
                 </div>
               </div>
 
-              <div className="cu-grid-3">
+              {!!confirmedRequests?.length && (
                 <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Kundendaten</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>
-                    {customer.firstName} {customer.lastName}
-                  </h3>
-                  <p className="cu-muted" style={{ marginBottom: 4 }}>{customer.email}</p>
-                  <p className="cu-muted" style={{ margin: 0 }}>{customer.phone}</p>
-                </div>
+                  <span className="cu-mini-badge">Bestätigte Termine</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Vom Salon bestätigt</h3>
 
-                <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Letzter Verlauf</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>
-                    {hairHistory[0]?.title || "Noch kein Eintrag"}
-                  </h3>
-                  <p className="cu-muted" style={{ margin: 0 }}>
-                    {hairHistory[0]?.note || "Noch keine Daten vorhanden"}
-                  </p>
-                </div>
+                  <div className="cu-request-list" style={{ marginTop: 14 }}>
+                    {confirmedRequests.map((request) => (
+                      <div key={request.id} className="cu-request-item">
+                        <div className="cu-request-top">
+                          <div>
+                            <strong>{request.mainService}</strong>
+                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
+                              {request.preferredDate}
+                              {request.preferredTime ? ` um ${request.preferredTime}` : ""}
+                            </p>
+                          </div>
+                          <span className="cu-request-status">{request.status}</span>
+                        </div>
 
-                <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Aktueller Wunsch</span>
-                  <h3 style={{ marginTop: 12, fontSize: 18 }}>
-                    {latestRequest?.mainService || "Noch nichts gewählt"}
-                  </h3>
-                  <p className="cu-muted" style={{ margin: 0 }}>
-                    {latestRequest?.desiredLook || "Noch kein Wunschlook hinterlegt"}
-                  </p>
+                        <div className="cu-summary-block">
+                          <span className="cu-summary-label">Wunschfriseur</span>
+                          <p className="cu-summary-text">{request.preferredStylist || "Egal"}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </section>
           )}
 
@@ -1177,7 +1306,7 @@ setActiveTab("dashboard");
                                 : "1px solid rgba(255,255,255,0.10)",
                               background: active
                                 ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
-                                : "rgba(255,255,255,0.035)",
+                                : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
                               color: active ? "#efcf72" : "#fff",
                             }}
                           >
@@ -1205,7 +1334,7 @@ setActiveTab("dashboard");
                                 : "1px solid rgba(255,255,255,0.10)",
                               background: active
                                 ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
-                                : "rgba(255,255,255,0.035)",
+                                : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
                               color: active ? "#efcf72" : "#fff",
                             }}
                           >
@@ -1447,7 +1576,6 @@ setActiveTab("dashboard");
                       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                         {STYLIST_OPTIONS.map((stylist) => {
                           const active = appointmentPrep.preferredStylist === stylist;
-
                           return (
                             <button
                               key={stylist}
@@ -1460,7 +1588,7 @@ setActiveTab("dashboard");
                                   : "1px solid rgba(255,255,255,0.10)",
                                 background: active
                                   ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
-                                  : "rgba(255,255,255,0.035)",
+                                  : "linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025))",
                                 color: active ? "#efcf72" : "#fff",
                               }}
                             >
@@ -1568,6 +1696,82 @@ setActiveTab("dashboard");
             </section>
           )}
 
+          {activeTab === "reviews" && (
+            <section className="cu-grid">
+              <div className="cu-section-head">
+                <div>
+                  <span className="cu-mini-badge">Bewertungssystem</span>
+                  <h2 className="cu-section-title">Deine Bewertung für den Salon</h2>
+                  <p className="cu-muted">
+                    Teile dein Erlebnis und hilf dem Salon mit ehrlichem Feedback.
+                  </p>
+                </div>
+              </div>
+
+              <div className="cu-grid-2">
+                <div className="cu-card cu-card-padding">
+                  <h3 style={{ marginBottom: 16 }}>Neue Bewertung</h3>
+
+                  <div className="cu-form-group">
+                    <label className="cu-label">Sterne</label>
+                    <StarRow value={newRating} onChange={setNewRating} />
+                  </div>
+
+                  <div className="cu-form-group">
+                    <label className="cu-label">Kommentar</label>
+                    <textarea
+                      className="cu-textarea"
+                      placeholder="Wie war dein Termin im Salon?"
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="cu-actions">
+                    <button className="cu-primary-btn" onClick={handleSubmitReview}>
+                      Bewertung speichern
+                    </button>
+                  </div>
+
+                  {reviewSaved ? (
+                    <div className="cu-save-success">
+                      Deine Bewertung wurde gespeichert.
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="cu-card cu-card-padding">
+                  <span className="cu-mini-badge">Durchschnitt</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>⭐ {averageRating} / 5</h3>
+                  <p className="cu-muted" style={{ marginTop: 8 }}>
+                    Basierend auf den letzten Kundenerfahrungen im Hair Pass Studio.
+                  </p>
+
+                  <div className="cu-request-list" style={{ marginTop: 16 }}>
+                    {reviews.slice(0, 3).map((item) => (
+                      <div key={item.id} className="cu-request-item">
+                        <div className="cu-request-top">
+                          <div>
+                            <strong>{item.customerName}</strong>
+                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
+                              {item.date}
+                            </p>
+                          </div>
+                          <span className="cu-request-status">⭐ {item.rating}</span>
+                        </div>
+
+                        <div className="cu-summary-block">
+                          <span className="cu-summary-label">Kommentar</span>
+                          <p className="cu-summary-text">{item.comment}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+          )}
+
           {activeTab === "summary" && (
             <section className="cu-grid">
               <div className="cu-section-head">
@@ -1601,13 +1805,6 @@ setActiveTab("dashboard");
                     <span className="cu-summary-label">Haarprofil</span>
                     <p className="cu-summary-text">
                       {hairProfile.hairLength}, {hairProfile.hairStructure}, {hairProfile.currentHairColor}
-                    </p>
-                  </div>
-
-                  <div className="cu-summary-block">
-                    <span className="cu-summary-label">Behandlungen</span>
-                    <p className="cu-summary-text">
-                      {hairProfile.previousTreatments || "Keine Angabe"}
                     </p>
                   </div>
                 </div>
@@ -1681,8 +1878,8 @@ setActiveTab("dashboard");
 
       {popup.visible ? (
         <div className="cu-popup">
-          <strong style={{ display: "block", marginBottom: 4 }}>Hair Pass</strong>
-          <span style={{ color: "rgba(255,255,255,0.86)", fontSize: 14 }}>{popup.message}</span>
+          <div className="cu-popup-title">{popup.title}</div>
+          <div className="cu-popup-text">{popup.message}</div>
         </div>
       ) : null}
 

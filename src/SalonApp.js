@@ -192,6 +192,8 @@ export default function SalonApp({
   sharedRequests = [],
   onUpdateRequestStatus,
 }) {
+  alert("SALON TEST AKTIV");
+  
   const [salonProfile, setSalonProfile] = useState({
   salonName: "",
   email: "",

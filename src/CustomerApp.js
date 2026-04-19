@@ -24,6 +24,7 @@ const STYLIST_OPTIONS = [
   "Barber Specialist",
   "Color Specialist",
 ];
+
 const INITIAL_HISTORY = [
   {
     id: "history-1",
@@ -52,15 +53,17 @@ const INITIAL_INSPIRATIONS = [
     id: "inspo-1",
     title: "Soft Glow Bob",
     subtitle: "Natürlicher, eleganter Look",
-    colorA: "#5a4020",
-    colorB: "#161616",
+    category: "Bob · Soft Finish",
+    colorA: "#4f3516",
+    colorB: "#111111",
   },
   {
     id: "inspo-2",
     title: "Warme Balayage",
     subtitle: "Weicher, luxuriöser Verlauf",
+    category: "Color · Luxury Blend",
     colorA: "#6a4923",
-    colorB: "#171717",
+    colorB: "#161616",
   },
 ];
 
@@ -73,11 +76,63 @@ const NAV_ITEMS = [
   { id: "summary", label: "Final" },
 ];
 
-function DemoVisual({ title, subtitle, colorA = "#2a2a2a", colorB = "#141414" }) {
+function InspirationVisual({ title, subtitle, category, colorA, colorB }) {
   return (
     <div
       style={{
-        minHeight: 160,
+        minHeight: 260,
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: "20px 20px 0 0",
+        background: `linear-gradient(135deg, ${colorA}, ${colorB})`,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 20%), radial-gradient(circle at 80% 15%, rgba(212,175,55,0.10), transparent 18%), linear-gradient(180deg, rgba(0,0,0,0.02), rgba(0,0,0,0.35))",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: 18,
+          right: 18,
+          bottom: 18,
+        }}
+      >
+        <div
+          style={{
+            display: "inline-flex",
+            minHeight: 34,
+            alignItems: "center",
+            padding: "7px 12px",
+            borderRadius: 999,
+            background: "rgba(0,0,0,0.26)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            fontWeight: 800,
+            fontSize: 12,
+          }}
+        >
+          {category}
+        </div>
+
+        <h3 style={{ margin: "12px 0 6px", fontSize: 20 }}>{title}</h3>
+        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.86)" }}>
+          {subtitle}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function HistoryVisual({ title, subtitle, colorA = "#2a2a2a", colorB = "#141414" }) {
+  return (
+    <div
+      style={{
+        minHeight: 150,
         position: "relative",
         overflow: "hidden",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -126,10 +181,16 @@ function DemoVisual({ title, subtitle, colorA = "#2a2a2a", colorB = "#141414" })
 export default function CustomerApp({
   onLogout,
   currentUser,
-  sharedRequests,
+  sharedRequests = [],
+  confirmedRequests = [],
   onCreateRequest,
 }) {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [lastSubmittedRequest, setLastSubmittedRequest] = useState(null);
+  const [submitError, setSubmitError] = useState("");
+  const [popup, setPopup] = useState({ visible: false, message: "" });
 
   const [customer, setCustomer] = useState({
     firstName: currentUser?.firstName || "Deniz",
@@ -160,11 +221,6 @@ export default function CustomerApp({
     importantNote: "",
   });
 
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [lastSubmittedRequest, setLastSubmittedRequest] = useState(null);
-  const [submitError, setSubmitError] = useState("");
-  const [profileSaved, setProfileSaved] = useState(false);
-
   useEffect(() => {
     if (!currentUser) return;
     setCustomer((prev) => ({
@@ -177,11 +233,11 @@ export default function CustomerApp({
   }, [currentUser]);
 
   useEffect(() => {
-    const existing = document.getElementById("hairpass-customer-sync-styles");
+    const existing = document.getElementById("hairpass-customer-premium-v2");
     if (existing) return;
 
     const style = document.createElement("style");
-    style.id = "hairpass-customer-sync-styles";
+    style.id = "hairpass-customer-premium-v2";
     style.innerHTML = `
       * { box-sizing: border-box; }
       html, body, #root {
@@ -206,9 +262,8 @@ export default function CustomerApp({
         max-width: 1180px;
         margin: 0 auto;
         padding: 18px;
-        padding-bottom: 96px;
+        padding-bottom: 90px;
       }
-
       .cu-topbar {
         display: flex;
         align-items: flex-start;
@@ -216,7 +271,6 @@ export default function CustomerApp({
         gap: 14px;
         margin-bottom: 18px;
       }
-
       .cu-badge, .cu-mini-badge {
         display: inline-flex;
         align-items: center;
@@ -232,7 +286,6 @@ export default function CustomerApp({
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
-
       .cu-title {
         margin: 10px 0 6px;
         font-size: clamp(28px, 4.4vw, 44px);
@@ -240,7 +293,6 @@ export default function CustomerApp({
         font-weight: 800;
         letter-spacing: -0.025em;
       }
-
       .cu-subtitle {
         margin: 0;
         max-width: 760px;
@@ -249,7 +301,7 @@ export default function CustomerApp({
         line-height: 1.55;
       }
 
-      .cu-logout-btn, .cu-primary-btn, .cu-secondary-btn, .cu-nav-btn, .cu-service-btn, .cu-extra-btn {
+      .cu-primary-btn, .cu-secondary-btn, .cu-logout-btn, .cu-nav-btn, .cu-service-btn, .cu-extra-btn {
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
       }
@@ -262,20 +314,17 @@ export default function CustomerApp({
         font-weight: 700;
         font-size: 13px;
       }
-
       .cu-primary-btn {
         border: none;
         background: linear-gradient(135deg, #d4af37 0%, #e8cb73 100%);
         color: #121212;
         box-shadow: 0 8px 18px rgba(212,175,55,0.14);
       }
-
       .cu-secondary-btn {
         border: 1px solid rgba(255,255,255,0.09);
         background: rgba(255,255,255,0.04);
         color: #fff;
       }
-
       .cu-logout-btn {
         border: 1px solid rgba(255,80,80,0.22);
         background: linear-gradient(135deg, rgba(110,18,18,0.34), rgba(70,8,8,0.88));
@@ -289,7 +338,6 @@ export default function CustomerApp({
         gap: 8px;
         margin-bottom: 18px;
       }
-
       .cu-nav-btn {
         min-height: 38px;
         padding: 8px 12px;
@@ -302,23 +350,20 @@ export default function CustomerApp({
         cursor: pointer;
         white-space: nowrap;
       }
-
       .cu-nav-btn.active {
         background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.34);
-        box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
       }
 
       .cu-grid, .cu-grid-2, .cu-grid-3, .cu-grid-4, .cu-card-grid, .cu-appointment-layout, .cu-service-grid, .cu-form-grid {
         display: grid;
         gap: 14px;
       }
-
       .cu-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .cu-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .cu-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .cu-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .cu-appointment-layout { grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.9fr); }
+      .cu-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .cu-appointment-layout { grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.95fr); }
       .cu-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .cu-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
@@ -330,7 +375,6 @@ export default function CustomerApp({
         box-shadow: 0 12px 36px rgba(0,0,0,0.18);
         backdrop-filter: blur(14px);
       }
-
       .cu-card-padding { padding: 14px; }
       .cu-hero { padding: 16px; }
 
@@ -340,15 +384,12 @@ export default function CustomerApp({
         justify-content: space-between;
         gap: 14px;
       }
-
       .cu-hero h2, .cu-section-title, .cu-card h3 { margin: 0; }
-
       .cu-hero h2 {
         margin-top: 10px;
         font-size: clamp(22px, 3.8vw, 32px);
         line-height: 1.08;
       }
-
       .cu-section-title {
         margin-top: 8px;
         font-size: clamp(20px, 3.2vw, 28px);
@@ -360,14 +401,12 @@ export default function CustomerApp({
         line-height: 1.55;
         font-size: 14px;
       }
-
       .cu-actions {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
         margin-top: 14px;
       }
-
       .cu-stat-value {
         display: block;
         margin-top: 10px;
@@ -380,17 +419,14 @@ export default function CustomerApp({
         flex-direction: column;
         gap: 7px;
       }
-
       .cu-form-group + .cu-form-group {
         margin-top: 14px;
       }
-
       .cu-label {
         font-size: 13px;
         color: rgba(255,255,255,0.78);
         font-weight: 600;
       }
-
       .cu-input, .cu-textarea {
         width: 100%;
         min-height: 46px;
@@ -402,12 +438,10 @@ export default function CustomerApp({
         outline: none;
         font-size: 14px;
       }
-
       .cu-textarea {
         min-height: 104px;
         resize: vertical;
       }
-
       .cu-full-width { grid-column: 1 / -1; }
 
       .cu-service-btn {
@@ -420,19 +454,16 @@ export default function CustomerApp({
         color: #fff;
         cursor: pointer;
       }
-
       .cu-service-btn.active {
         background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.35);
       }
-
       .cu-service-top {
         display: flex;
         align-items: center;
         gap: 10px;
         margin-bottom: 8px;
       }
-
       .cu-service-icon {
         width: 34px;
         height: 34px;
@@ -443,12 +474,10 @@ export default function CustomerApp({
         background: rgba(255,255,255,0.08);
         font-size: 16px;
       }
-
       .cu-service-name {
         font-size: 15px;
         font-weight: 800;
       }
-
       .cu-service-desc {
         font-size: 13px;
         color: rgba(255,255,255,0.72);
@@ -461,7 +490,6 @@ export default function CustomerApp({
         gap: 9px;
         margin-top: 12px;
       }
-
       .cu-extra-btn {
         min-height: 38px;
         padding: 8px 12px;
@@ -473,7 +501,6 @@ export default function CustomerApp({
         font-weight: 700;
         cursor: pointer;
       }
-
       .cu-extra-btn.active {
         background: linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05));
         border-color: rgba(212,175,55,0.35);
@@ -481,7 +508,6 @@ export default function CustomerApp({
       }
 
       .cu-summary-block + .cu-summary-block { margin-top: 14px; }
-
       .cu-summary-label {
         display: block;
         margin-bottom: 7px;
@@ -491,7 +517,6 @@ export default function CustomerApp({
         letter-spacing: 0.08em;
         text-transform: uppercase;
       }
-
       .cu-summary-text {
         margin: 0;
         color: rgba(255,255,255,0.94);
@@ -505,7 +530,6 @@ export default function CustomerApp({
         flex-wrap: wrap;
         gap: 8px;
       }
-
       .cu-tag {
         display: inline-flex;
         align-items: center;
@@ -519,55 +543,23 @@ export default function CustomerApp({
         font-weight: 700;
       }
 
-      .cu-status-banner {
-        padding: 14px 16px;
-        border-radius: 18px;
-        background: linear-gradient(135deg, rgba(34,197,94,0.14), rgba(255,255,255,0.04));
-        border: 1px solid rgba(34,197,94,0.22);
-      }
-
-      .cu-status-banner h3 {
-        margin: 0 0 8px 0;
-        font-size: 16px;
-      }
-
-      .cu-status-banner p {
-        margin: 0;
-        font-size: 13px;
-        color: rgba(255,255,255,0.84);
-        line-height: 1.5;
-      }
-
-      .cu-error-box {
-        margin-top: 12px;
-        padding: 12px 14px;
-        border-radius: 14px;
-        background: rgba(239,68,68,0.10);
-        border: 1px solid rgba(239,68,68,0.22);
-        color: #ffd0d0;
-        font-size: 13px;
-      }
-
       .cu-request-list {
         display: flex;
         flex-direction: column;
         gap: 10px;
       }
-
       .cu-request-item {
         padding: 14px;
         border-radius: 16px;
         background: rgba(255,255,255,0.035);
         border: 1px solid rgba(255,255,255,0.07);
       }
-
       .cu-request-top {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
         gap: 10px;
       }
-
       .cu-request-status {
         display: inline-flex;
         align-items: center;
@@ -588,7 +580,6 @@ export default function CustomerApp({
         background: rgba(255,255,255,0.035);
         border: 1px solid rgba(255,255,255,0.07);
       }
-
       .cu-save-success {
         margin-top: 12px;
         padding: 12px 14px;
@@ -598,6 +589,29 @@ export default function CustomerApp({
         color: #b8f5c7;
         font-size: 13px;
         font-weight: 600;
+      }
+      .cu-error-box {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: rgba(239,68,68,0.10);
+        border: 1px solid rgba(239,68,68,0.22);
+        color: #ffd0d0;
+        font-size: 13px;
+      }
+
+      .cu-popup {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        z-index: 9999;
+        max-width: 320px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(17,20,27,0.96), rgba(10,12,18,0.98));
+        border: 1px solid rgba(212,175,55,0.22);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.34);
+        color: #fff;
       }
 
       .cu-modal-backdrop {
@@ -611,7 +625,6 @@ export default function CustomerApp({
         padding: 14px;
         z-index: 1000;
       }
-
       .cu-modal {
         width: 100%;
         max-width: 500px;
@@ -621,19 +634,16 @@ export default function CustomerApp({
         border: 1px solid rgba(255,255,255,0.10);
         box-shadow: 0 24px 70px rgba(0,0,0,0.36);
       }
-
       .cu-modal h3 {
         margin: 10px 0 10px;
         font-size: 24px;
       }
-
       .cu-modal p {
         margin: 0;
         color: rgba(255,255,255,0.8);
         line-height: 1.55;
         font-size: 14px;
       }
-
       .cu-modal-actions {
         display: flex;
         gap: 10px;
@@ -658,22 +668,14 @@ export default function CustomerApp({
           padding: 14px;
           padding-bottom: 90px;
         }
-
-        .cu-topbar,
-        .cu-hero-head,
-        .cu-section-head {
+        .cu-topbar, .cu-hero-head, .cu-section-head {
           flex-direction: column;
           align-items: stretch;
         }
-
-        .cu-logout-btn,
-        .cu-actions > *,
-        .cu-modal-actions > * {
+        .cu-logout-btn, .cu-actions > *, .cu-modal-actions > * {
           width: 100%;
         }
-
-        .cu-actions,
-        .cu-modal-actions {
+        .cu-actions, .cu-modal-actions {
           flex-direction: column;
         }
       }
@@ -684,32 +686,44 @@ export default function CustomerApp({
           grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 8px;
         }
-
         .cu-nav-btn {
           width: 100%;
           min-height: 42px;
           text-align: center;
           white-space: normal;
         }
-
-        .cu-title {
-          font-size: 31px;
-        }
-
-        .cu-card-padding,
-        .cu-hero,
-        .cu-modal {
-          padding: 14px;
-        }
-
+        .cu-title { font-size: 31px; }
+        .cu-card-padding, .cu-hero, .cu-modal { padding: 14px; }
         .cu-request-top {
           flex-direction: column;
           align-items: flex-start;
+        }
+        .cu-popup {
+          left: 14px;
+          right: 14px;
+          top: 14px;
+          max-width: none;
         }
       }
     `;
     document.head.appendChild(style);
   }, []);
+
+  useEffect(() => {
+    if (confirmedRequests && confirmedRequests.length > 0) {
+      const newest = confirmedRequests[0];
+      if (newest && newest.id !== lastSubmittedRequest?.id) {
+        setPopup({
+          visible: true,
+          message: `Dein Termin für ${newest.mainService} wurde bestätigt.`,
+        });
+        const t = setTimeout(() => {
+          setPopup({ visible: false, message: "" });
+        }, 2600);
+        return () => clearTimeout(t);
+      }
+    }
+  }, [confirmedRequests]); // eslint-disable-line
 
   const selectedMainService = useMemo(
     () =>
@@ -774,8 +788,9 @@ export default function CustomerApp({
   const addDemoInspiration = () => {
     const next = {
       id: `inspo-${Date.now()}`,
-      title: `Neue Inspiration ${inspirations.length + 1}`,
-      subtitle: "Frischer Look für den nächsten Besuch",
+      title: `Neue Luxus-Inspiration ${inspirations.length + 1}`,
+      subtitle: "Neue Richtung für deinen nächsten Termin",
+      category: "Luxury Look",
       colorA: "#7b5a2f",
       colorB: "#171717",
     };
@@ -785,6 +800,19 @@ export default function CustomerApp({
   const handleSaveProfile = () => {
     setProfileSaved(true);
     setTimeout(() => setProfileSaved(false), 2200);
+  };
+
+  const handleUseInspiration = (item) => {
+    setAppointmentPrep((prev) => ({
+      ...prev,
+      desiredLook: item.title,
+    }));
+    setPopup({
+      visible: true,
+      message: `${item.title} wurde als Wunschlook übernommen.`,
+    });
+    setTimeout(() => setPopup({ visible: false, message: "" }), 2200);
+    setActiveTab("appointment");
   };
 
   const handleSubmitRequest = () => {
@@ -848,16 +876,6 @@ export default function CustomerApp({
 
           {activeTab === "dashboard" && (
             <section className="cu-grid">
-              {latestRequest ? (
-                <div className="cu-status-banner">
-                  <h3>Deine letzte Anfrage ist synchron mit dem Salon verbunden.</h3>
-                  <p>
-                    <strong>{latestRequest.mainService}</strong> · Status:{" "}
-                    <strong>{latestRequest.status}</strong>
-                  </p>
-                </div>
-              ) : null}
-
               <div className="cu-card cu-hero">
                 <div className="cu-hero-head">
                   <div>
@@ -899,13 +917,86 @@ export default function CustomerApp({
                 </div>
 
                 <div className="cu-card cu-card-padding">
-                  <span className="cu-mini-badge">Verlaufsfotos</span>
+                  <span className="cu-mini-badge">Verläufe</span>
                   <span className="cu-stat-value">{hairHistory.length}</span>
                 </div>
 
                 <div className="cu-card cu-card-padding">
                   <span className="cu-mini-badge">Inspirationen</span>
                   <span className="cu-stat-value">{inspirations.length}</span>
+                </div>
+              </div>
+
+              <div className="cu-grid-2">
+                <div className="cu-card cu-card-padding">
+                  <span className="cu-mini-badge">Bestätigte Termine</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Vom Salon bestätigt</h3>
+
+                  {!confirmedRequests || confirmedRequests.length === 0 ? (
+                    <p className="cu-muted" style={{ marginBottom: 0 }}>
+                      Noch keine bestätigten Termine.
+                    </p>
+                  ) : (
+                    <div className="cu-request-list" style={{ marginTop: 14 }}>
+                      {confirmedRequests.map((request) => (
+                        <div key={request.id} className="cu-request-item">
+                          <div className="cu-request-top">
+                            <div>
+                              <strong>{request.mainService}</strong>
+                              <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
+                                {request.preferredDate}
+                                {request.preferredTime ? ` um ${request.preferredTime}` : ""}
+                              </p>
+                            </div>
+                            <span className="cu-request-status">{request.status}</span>
+                          </div>
+
+                          <div className="cu-summary-block">
+                            <span className="cu-summary-label">Wunschfriseur</span>
+                            <p className="cu-summary-text">{request.preferredStylist || "Egal"}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="cu-card cu-card-padding">
+                  <span className="cu-mini-badge">Synchronisierte Anfragen</span>
+                  <h3 style={{ marginTop: 12, fontSize: 18 }}>Dein aktueller Status</h3>
+
+                  {!sharedRequests || sharedRequests.length === 0 ? (
+                    <p className="cu-muted" style={{ marginBottom: 0 }}>
+                      Noch keine Anfrage gesendet.
+                    </p>
+                  ) : (
+                    <div className="cu-request-list" style={{ marginTop: 14 }}>
+                      {sharedRequests.map((request) => (
+                        <div key={request.id} className="cu-request-item">
+                          <div className="cu-request-top">
+                            <div>
+                              <strong>{request.mainService}</strong>
+                              <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
+                                {request.preferredDate}
+                                {request.preferredTime ? ` um ${request.preferredTime}` : ""}
+                              </p>
+                            </div>
+                            <span className="cu-request-status">{request.status}</span>
+                          </div>
+
+                          <div className="cu-summary-block">
+                            <span className="cu-summary-label">Wunschfriseur</span>
+                            <p className="cu-summary-text">{request.preferredStylist || "Egal"}</p>
+                          </div>
+
+                          <div className="cu-summary-block">
+                            <span className="cu-summary-label">Wunschlook</span>
+                            <p className="cu-summary-text">{request.desiredLook}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -938,49 +1029,6 @@ export default function CustomerApp({
                     {latestRequest?.desiredLook || "Noch kein Wunschlook hinterlegt"}
                   </p>
                 </div>
-              </div>
-
-              <div className="cu-card cu-card-padding">
-                <div className="cu-section-head">
-                  <div>
-                    <span className="cu-mini-badge">Anfragen</span>
-                    <h2 className="cu-section-title">Deine synchronen Terminwünsche</h2>
-                    <p className="cu-muted">Hier sieht der Kunde dieselben Anfragen wie der Salon.</p>
-                  </div>
-                </div>
-
-                {!sharedRequests || sharedRequests.length === 0 ? (
-                  <p className="cu-muted" style={{ marginBottom: 0 }}>Noch keine Anfrage gesendet.</p>
-                ) : (
-                  <div className="cu-request-list" style={{ marginTop: 14 }}>
-                    {sharedRequests.map((request) => (
-                      <div key={request.id} className="cu-request-item">
-                        <div className="cu-request-top">
-                          <div>
-                            <strong>{request.mainService}</strong>
-                            <p className="cu-muted" style={{ margin: "6px 0 0 0" }}>
-                              {request.preferredDate}
-                              {request.preferredTime ? ` um ${request.preferredTime}` : ""}
-                            </p>
-                          </div>
-                          <span className="cu-request-status">{request.status}</span>
-                        </div>
-
-                        <div className="cu-summary-block">
-                          <span className="cu-summary-label">Extras</span>
-                          <p className="cu-summary-text">
-                            {request.extras?.length > 0 ? request.extras.join(", ") : "Keine Extras"}
-                          </p>
-                        </div>
-
-                        <div className="cu-summary-block">
-  <span className="cu-summary-label">Wunschfriseur</span>
-  <p className="cu-summary-text">{request.preferredStylist || "Egal"}</p>
-</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
             </section>
           )}
@@ -1185,7 +1233,7 @@ export default function CustomerApp({
               <div className="cu-grid">
                 {hairHistory.map((item) => (
                   <div key={item.id} className="cu-card">
-                    <DemoVisual
+                    <HistoryVisual
                       title={item.title}
                       subtitle={item.date}
                       colorA={item.colorA}
@@ -1233,17 +1281,28 @@ export default function CustomerApp({
 
               <div className="cu-card-grid">
                 {inspirations.map((item) => (
-                  <div key={item.id} className="cu-card">
-                    <DemoVisual
+                  <div key={item.id} className="cu-card" style={{ overflow: "hidden" }}>
+                    <InspirationVisual
                       title={item.title}
                       subtitle={item.subtitle}
+                      category={item.category}
                       colorA={item.colorA}
                       colorB={item.colorB}
                     />
                     <div className="cu-card-padding">
-                      <span className="cu-mini-badge">Wunschlook</span>
-                      <h3 style={{ marginTop: 12, fontSize: 18 }}>{item.title}</h3>
-                      <p className="cu-muted" style={{ marginBottom: 0 }}>{item.subtitle}</p>
+                      <div className="cu-summary-block" style={{ marginTop: 0 }}>
+                        <span className="cu-summary-label">Beschreibung</span>
+                        <p className="cu-summary-text">{item.subtitle}</p>
+                      </div>
+
+                      <div className="cu-actions">
+                        <button
+                          className="cu-primary-btn"
+                          onClick={() => handleUseInspiration(item)}
+                        >
+                          Als Wunschlook wählen
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -1302,47 +1361,57 @@ export default function CustomerApp({
                   </div>
 
                   <div className="cu-form-grid" style={{ marginTop: 18 }}>
-  <div className="cu-form-group">
-    <label className="cu-label">Gewünschter Look</label>
-    <input
-      className="cu-input"
-      placeholder="z. B. natürlicher Glow Bob"
-      value={appointmentPrep.desiredLook}
-      onChange={(e) => updateAppointment("desiredLook", e.target.value)}
-    />
-  </div>
+                    <div className="cu-form-group">
+                      <label className="cu-label">Gewünschter Look</label>
+                      <input
+                        className="cu-input"
+                        placeholder="z. B. natürlicher Glow Bob"
+                        value={appointmentPrep.desiredLook}
+                        onChange={(e) => updateAppointment("desiredLook", e.target.value)}
+                      />
+                    </div>
 
-  <div className="cu-form-group">
-    <label className="cu-label">Wunschfriseur</label>
-    <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-      {STYLIST_OPTIONS.map((stylist) => {
-        const active = appointmentPrep.preferredStylist === stylist;
+                    <div className="cu-form-group">
+                      <label className="cu-label">Wunschfriseur</label>
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                        {STYLIST_OPTIONS.map((stylist) => {
+                          const active = appointmentPrep.preferredStylist === stylist;
 
-        return (
-          <button
-            key={stylist}
-            type="button"
-            onClick={() => updateAppointment("preferredStylist", stylist)}
-            className="cu-extra-btn"
-            style={{
-              border: active
-                ? "1px solid rgba(212,175,55,0.35)"
-                : "1px solid rgba(255,255,255,0.10)",
-              background: active
-                ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
-                : "rgba(255,255,255,0.035)",
-              color: active ? "#efcf72" : "#fff",
-            }}
-          >
-            {stylist}
-          </button>
-        );
-      })}
-    </div>
-  </div>
+                          return (
+                            <button
+                              key={stylist}
+                              type="button"
+                              onClick={() => updateAppointment("preferredStylist", stylist)}
+                              className="cu-extra-btn"
+                              style={{
+                                border: active
+                                  ? "1px solid rgba(212,175,55,0.35)"
+                                  : "1px solid rgba(255,255,255,0.10)",
+                                background: active
+                                  ? "linear-gradient(135deg, rgba(212,175,55,0.16), rgba(255,255,255,0.05))"
+                                  : "rgba(255,255,255,0.035)",
+                                color: active ? "#efcf72" : "#fff",
+                              }}
+                            >
+                              {stylist}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
 
-  <div className="cu-form-group">
-    <label className="cu-label">Wunschdatum</label>
+                    <div className="cu-form-group">
+                      <label className="cu-label">Wunschdatum</label>
+                      <input
+                        className="cu-input"
+                        type="date"
+                        value={appointmentPrep.preferredDate}
+                        onChange={(e) => updateAppointment("preferredDate", e.target.value)}
+                      />
+                    </div>
+
+                    <div className="cu-form-group">
+                      <label className="cu-label">Wunschzeit</label>
                       <input
                         className="cu-input"
                         type="time"
@@ -1390,11 +1459,18 @@ export default function CustomerApp({
                   </div>
 
                   <div className="cu-summary-block">
-  <span className="cu-summary-label">Wunschfriseur</span>
-  <p className="cu-summary-text">
-    {appointmentPrep.preferredStylist || "Egal"}
-  </p>
-</div>
+                    <span className="cu-summary-label">Wunschlook</span>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.desiredLook || "Keine Angabe"}
+                    </p>
+                  </div>
+
+                  <div className="cu-summary-block">
+                    <span className="cu-summary-label">Wunschfriseur</span>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.preferredStylist || "Egal"}
+                    </p>
+                  </div>
 
                   <div className="cu-summary-block">
                     <span className="cu-summary-label">Termin</span>
@@ -1496,6 +1572,13 @@ export default function CustomerApp({
                   </div>
 
                   <div className="cu-summary-block">
+                    <span className="cu-summary-label">Wunschfriseur</span>
+                    <p className="cu-summary-text">
+                      {appointmentPrep.preferredStylist || "Egal"}
+                    </p>
+                  </div>
+
+                  <div className="cu-summary-block">
                     <span className="cu-summary-label">Termin</span>
                     <p className="cu-summary-text">
                       {appointmentPrep.preferredDate || "Kein Datum"}
@@ -1524,6 +1607,13 @@ export default function CustomerApp({
           )}
         </main>
       </div>
+
+      {popup.visible ? (
+        <div className="cu-popup">
+          <strong style={{ display: "block", marginBottom: 4 }}>Hair Pass</strong>
+          <span style={{ color: "rgba(255,255,255,0.86)", fontSize: 14 }}>{popup.message}</span>
+        </div>
+      ) : null}
 
       {showSuccessModal && lastSubmittedRequest ? (
         <div className="cu-modal-backdrop">

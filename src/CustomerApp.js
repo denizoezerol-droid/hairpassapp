@@ -13,7 +13,7 @@ const EXTRA_SERVICES = [
   { id: "massage", name: "Kopfmassage" },
   { id: "eyebrows", name: "Augenbrauen" },
   { id: "gloss", name: "Glossing" },
-  { id: "premium", name: "Premium Finish" },
+  { id: "premium", name: "Hochsteckfrisur" },
 ];
 
 const STYLIST_OPTIONS = [

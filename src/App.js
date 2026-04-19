@@ -252,7 +252,7 @@ export default function App() {
   onLogout={handleLogout}
   currentUser={loggedInUser}
   sharedRequests={customerRequests}
-  confirmedRequests={[]}
+  confirmedRequests={customerRequests.filter((request) => request.status === "Bestätigt")}
   onCreateRequest={handleCreateRequest}
 />
     );

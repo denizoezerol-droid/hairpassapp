@@ -936,7 +936,10 @@ const showPopupMessage = (message, tone = null) => {
               <button
                 key={item.id}
                 className={`cu-nav-btn ${activeTab === item.id ? "active" : ""}`}
-                onClick={() => setActiveTab(item.id)}
+                onClick={() => {
+  unlockAudio();
+  setActiveTab(item.id);
+}}
               >
                 {item.label}
               </button>

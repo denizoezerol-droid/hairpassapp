@@ -767,20 +767,26 @@ const showPopupMessage = (message, tone = null) => {
   }, []);
 
   useEffect(() => {
-    if (confirmedRequests && confirmedRequests.length > 0) {
-      const newest = confirmedRequests[0];
-      if (newest && newest.id !== lastSubmittedRequest?.id) {
-        setPopup({
-          visible: true,
-          message: `Dein Termin für ${newest.mainService} wurde bestätigt.`,
-        });
-        const t = setTimeout(() => {
-          setPopup({ visible: false, message: "" });
-        }, 2600);
-        return () => clearTimeout(t);
-      }
-    }
-  }, [confirmedRequests]); // eslint-disable-line
+  const confirmedIds = (confirmedRequests || []).map((item) => item.id);
+
+  if (previousConfirmedIdsRef.current.length === 0) {
+    previousConfirmedIdsRef.current = confirmedIds;
+    return;
+  }
+
+  const newlyConfirmed = (confirmedRequests || []).find(
+    (item) => !previousConfirmedIdsRef.current.includes(item.id)
+  );
+
+  if (newlyConfirmed) {
+    showPopupMessage(
+      `Dein Termin für ${newlyConfirmed.mainService} wurde bestätigt.`,
+      "confirmed"
+    );
+  }
+
+  previousConfirmedIdsRef.current = confirmedIds;
+}, [confirmedRequests]);
 
   const selectedMainService = useMemo(
     () =>
